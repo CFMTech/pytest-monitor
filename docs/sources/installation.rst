@@ -13,9 +13,9 @@ Supported environments
 
 The following versions of Python are supported:
 
- - Python 3.5
- - Python 3.6
- - Python 3.7
+- Python 3.5
+- Python 3.6
+- Python 3.7
 
 Support for Python 3.8 is still experimental.
 
