@@ -25,7 +25,9 @@ pytest-monitor
     :target: https://circleci.com/gh/CFMTech/pytest-monitor/tree/master
     :alt: See Build Status on Circle CI
 
-
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+    :target: https://opensource.org/licenses/MIT
+    
 
 Pytest-monitor is a pytest plugin designed for analyzing resource usage.
 
