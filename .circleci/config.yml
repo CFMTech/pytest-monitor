@@ -1,0 +1,159 @@
+version: 2.1
+
+# Pipeline template
+shared: &shared
+    docker:
+        - image: continuumio/miniconda3
+          environment:
+             BASH_ENV: ~/.bashrc
+    working_directory: ~/pytest-monitor.ci
+    steps:
+        - checkout
+        - run:
+            name: "Setup Environment"
+            command: |
+                conda create -n ci ${CI_PYTHON} -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
+                conda install -n ci ${CI_PYTEST} -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
+                conda install -n ci wheel psutil memory_profiler -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
+                conda init bash
+        - run:
+            name: "Prepare Project"
+            command: |
+                conda activate ci
+                python setup.py develop
+        - run:
+            name: "Testing"
+            command: |
+                conda init bash
+                conda activate ci
+                mkdir test-results
+                pytest --junit-xml=test-results/junit.xml
+        - store_test_results:
+            path: test-results
+        - store_artifacts:
+            path: test-results
+
+# Workflow definition
+workflows:
+    standard:
+        jobs:
+            - pytestmonitor-py36-pytest44
+            - pytestmonitor-py36-pytest45
+            - pytestmonitor-py36-pytest46
+            - pytestmonitor-py36-pytest50
+            - pytestmonitor-py36-pytest51
+            - pytestmonitor-py36-pytest52
+            - pytestmonitor-py36-pytest53
+            - pytestmonitor-py37-pytest44
+            - pytestmonitor-py37-pytest45
+            - pytestmonitor-py37-pytest46
+            - pytestmonitor-py37-pytest50
+            - pytestmonitor-py37-pytest51
+            - pytestmonitor-py37-pytest52
+            - pytestmonitor-py37-pytest53
+            - pytestmonitor-py38-pytest46
+            - pytestmonitor-py38-pytest52
+            - pytestmonitor-py38-pytest53
+    nightly:
+        triggers:
+            - schedule:
+                cron: "0 0 * * *"
+                filters:
+                    branches:
+                        only:
+                            - master
+        jobs:
+            - nightly_build
+
+# Jobs definition
+jobs:
+    pytestmonitor-py36-pytest44:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=4.4'
+        <<: *shared
+    pytestmonitor-py36-pytest45:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=4.5'
+        <<: *shared
+    pytestmonitor-py36-pytest46:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=4.6'
+        <<: *shared
+    pytestmonitor-py36-pytest50:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=5.0'
+        <<: *shared
+    pytestmonitor-py36-pytest51:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=5.1'
+        <<: *shared
+    pytestmonitor-py36-pytest52:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=5.2'
+        <<: *shared
+    pytestmonitor-py36-pytest53:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=5.3'
+        <<: *shared
+    pytestmonitor-py37-pytest44:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=4.4'
+        <<: *shared
+    pytestmonitor-py37-pytest45:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=4.5'
+        <<: *shared
+    pytestmonitor-py37-pytest46:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=4.6'
+        <<: *shared
+    pytestmonitor-py37-pytest50:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=5.0'
+        <<: *shared
+    pytestmonitor-py37-pytest51:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=5.1'
+        <<: *shared
+    pytestmonitor-py37-pytest52:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=5.2'
+        <<: *shared
+    pytestmonitor-py37-pytest53:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=5.3'
+        <<: *shared
+    pytestmonitor-py38-pytest46:
+        environment:
+            CI_PYTHON: 'python=3.8'
+            CI_PYTEST: 'pytest=4.6'
+        <<: *shared
+    pytestmonitor-py38-pytest52:
+        environment:
+            CI_PYTHON: 'python=3.8'
+            CI_PYTEST: 'pytest=5.2'
+        <<: *shared
+    pytestmonitor-py38-pytest53:
+        environment:
+            CI_PYTHON: 'python=3.8'
+            CI_PYTEST: 'pytest=5.3'
+        <<: *shared
+    nightly_build:
+        environment:
+            CI_PYTHON: 'python'
+            CI_PYTEST: 'pytest'
+        <<: *shared

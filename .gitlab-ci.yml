@@ -1,0 +1,31 @@
+image: continuumio/miniconda
+
+stages:
+   - test
+   - deploy
+
+before_script:
+   - conda create -q -n pymon -y python=3.6
+   - conda install -q -n pymon psutil memory_profiler pytest -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
+   - source activate pymon
+   - python setup.py develop
+   - mkdir -p build/public
+   - mkdir public
+
+pymon_run_test:
+   stage: test
+   script:
+      - pytest 
+
+pages:
+    stage: deploy
+    except:
+      - branchs
+    script:
+      - conda install --file docs/requirements.txt -c defaults -c conda-forge -c anaconda -c pkgs/main -y
+      - cd docs/sources/ && make html && cd -
+      - mv docs/sources/_build/html/* public/
+    artifacts:
+        paths:
+           - public/
+        expire_in: 1 year
