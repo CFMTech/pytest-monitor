@@ -25,6 +25,12 @@ pytest-monitor
     :target: https://circleci.com/gh/CFMTech/pytest-monitor/tree/master
     :alt: See Build Status on Circle CI
 
+.. image:: https://anaconda.org/conda-forge/pytest-monitor/badges/platforms.svg
+    :target: https://anaconda.org/conda-forge/pytest-monitor
+
+.. image:: https://anaconda.org/conda-forge/pytest-monitor/badges/installer/conda.svg
+    :target: https://conda.anaconda.org/conda-forge
+
 .. image:: https://img.shields.io/badge/License-MIT-blue.svg
     :target: https://opensource.org/licenses/MIT
     
