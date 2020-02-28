@@ -28,8 +28,8 @@ pytest-monitor
 .. image:: https://anaconda.org/conda-forge/pytest-monitor/badges/platforms.svg
     :target: https://anaconda.org/conda-forge/pytest-monitor
 
-.. image:: https://anaconda.org/conda-forge/pytest-monitor/badges/installer/conda.svg
-    :target: https://conda.anaconda.org/conda-forge
+.. image:: https://anaconda.org/conda-forge/pytest-monitor/badges/version.svg
+    :target: https://anaconda.org/conda-forge/pytest-monitor
 
 .. image:: https://img.shields.io/badge/License-MIT-blue.svg
     :target: https://opensource.org/licenses/MIT
