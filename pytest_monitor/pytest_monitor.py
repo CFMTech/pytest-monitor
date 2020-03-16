@@ -122,12 +122,21 @@ def pytest_pyfunc_call(pyfuncitem):
     Core sniffer logic. We encapsulate the test function in a sniffer function to collect
     memory results.
     """
-    testfunction = pyfuncitem.obj
-    funcargs = pyfuncitem.funcargs
-    testargs = {arg: funcargs[arg] for arg in pyfuncitem._fixtureinfo.argnames}
+
+    def wrapped_function():
+        try:
+            funcargs = pyfuncitem.funcargs
+            testargs = {arg: funcargs[arg] for arg in pyfuncitem._fixtureinfo.argnames}
+            pyfuncitem.obj(**testargs)
+        except Exception:
+            raise
+        except BaseException as e:
+            return e
 
     def prof():
-        m = memory_profiler.memory_usage((testfunction, (), testargs), max_usage=True)
+        m = memory_profiler.memory_usage((wrapped_function, ()), max_usage=True, retval=True)
+        if isinstance(m[1], BaseException): # Do we have any outcome?
+            raise m[1]
         setattr(pyfuncitem, 'mem_usage', m)
         setattr(pyfuncitem, 'monitor_results', True)
     prof()
