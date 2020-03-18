@@ -235,7 +235,7 @@ jobs:
     deploy:
         docker:
             - image: continuumio/miniconda3
-            environment:
+              environment:
                 BASH_ENV: ~/.bashrc
         working_directory: ~/pytest-monitor.ci
         steps:
