@@ -37,23 +37,98 @@ shared: &shared
 workflows:
     standard:
         jobs:
-            - pytestmonitor-py36-pytest44
-            - pytestmonitor-py36-pytest45
-            - pytestmonitor-py36-pytest46
-            - pytestmonitor-py36-pytest50
-            - pytestmonitor-py36-pytest51
-            - pytestmonitor-py36-pytest52
-            - pytestmonitor-py36-pytest53
-            - pytestmonitor-py37-pytest44
-            - pytestmonitor-py37-pytest45
-            - pytestmonitor-py37-pytest46
-            - pytestmonitor-py37-pytest50
-            - pytestmonitor-py37-pytest51
-            - pytestmonitor-py37-pytest52
-            - pytestmonitor-py37-pytest53
-            - pytestmonitor-py38-pytest46
-            - pytestmonitor-py38-pytest52
-            - pytestmonitor-py38-pytest53
+            - pytestmonitor-py36-pytest44:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py36-pytest45:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py36-pytest46:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py36-pytest50:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py36-pytest51:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py36-pytest52:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py36-pytest53:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py37-pytest44:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py37-pytest45:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py37-pytest46:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py37-pytest50:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py37-pytest51:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py37-pytest52:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py37-pytest53:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py38-pytest46:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py38-pytest52:
+                filters:
+                    tags:
+                        only: /.*/
+            - pytestmonitor-py38-pytest53:
+                filters:
+                    tags:
+                        only: /.*/
+            - deploy:
+                requires:
+                    - pytestmonitor-py36-pytest44
+                    - pytestmonitor-py36-pytest45
+                    - pytestmonitor-py36-pytest46
+                    - pytestmonitor-py36-pytest50
+                    - pytestmonitor-py36-pytest51
+                    - pytestmonitor-py36-pytest52
+                    - pytestmonitor-py36-pytest53
+                    - pytestmonitor-py37-pytest44
+                    - pytestmonitor-py37-pytest45
+                    - pytestmonitor-py37-pytest46
+                    - pytestmonitor-py37-pytest50
+                    - pytestmonitor-py37-pytest51
+                    - pytestmonitor-py37-pytest52
+                    - pytestmonitor-py37-pytest53
+                    - pytestmonitor-py38-pytest46
+                    - pytestmonitor-py38-pytest52
+                    - pytestmonitor-py38-pytest53
+                filters:
+                    tags:
+                        only: /^[a-zA-Z].*/
+                    branches:
+                        ignore: /.*/
     nightly:
         triggers:
             - schedule:
@@ -157,3 +232,31 @@ jobs:
             CI_PYTHON: 'python'
             CI_PYTEST: 'pytest'
         <<: *shared
+    deploy:
+        docker:
+            - image: continuumio/miniconda3
+            environment:
+                BASH_ENV: ~/.bashrc
+        working_directory: ~/pytest-monitor.ci
+        steps:
+            - checkout
+            - run:
+                name: "Prepare for deployment"
+                command: |
+                    conda create -n ci python=3.8 twine wheel setuptools -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
+                    conda init bash
+                    echo -e "[pypi]" >> ~/.pypirc
+                    echo -e "username = __token__" >> ~/.pypirc
+                    echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+
+            - run:
+                name: "Package Project"
+                command: |
+                    conda activate ci
+                    python setup.py sdist bdist_wheel
+            - run:
+                name: "Publish"
+                command: |
+                    conda init bash
+                    conda activate ci
+                    twine upload dist/*
