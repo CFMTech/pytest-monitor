@@ -173,14 +173,6 @@ def pytest_sessionstart(session):
     yield
 
 
-def scoper(scope, monitor_skip_flag, set_scope):
-    should_skip = monitor_skip_flag
-    if scope in set_scope and not should_skip:
-        global PYTEST_MONITOR_SESSION
-        return PYTEST_MONITOR_SESSION
-    return None
-
-
 @pytest.fixture(autouse=True, scope='module')
 def prf_module_tracer(request):
     t_a = time.time()
