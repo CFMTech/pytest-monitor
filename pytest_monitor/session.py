@@ -1,6 +1,8 @@
 import datetime
 import json
 import memory_profiler
+import os
+import psutil
 import requests
 import subprocess
 import warnings
@@ -17,7 +19,7 @@ class PyTestMonitorSession(object):
         self.__scm = ''
         self.__eid = (None, None)
         self.__mem_usage_base = None
-
+        self.__process = psutil.Process(os.getpid())
         self.prepare()
 
     @property
@@ -27,6 +29,10 @@ class PyTestMonitorSession(object):
     @property
     def db_env_id(self):
         return self.__eid[0]
+
+    @property
+    def process(self):
+        return self.__process
 
     def get_env_id(self, env):
         db, remote = None, None
@@ -77,7 +83,10 @@ class PyTestMonitorSession(object):
         if self.__db:
             self.__db.prepare()
 
-    def add_test_info(self, item, kind, component, item_start_time, total_time, user_time, kernel_time, mem_usage):
+    def add_test_info(self, item, kind, allowed_scope, component, item_start_time, total_time,
+                      user_time, kernel_time, mem_usage):
+        if kind not in allowed_scope:
+            return
         mem_usage = float(mem_usage) - self.__mem_usage_base
         cpu_usage = (user_time + kernel_time) / total_time
         item_start_time = datetime.datetime.fromtimestamp(item_start_time).isoformat()

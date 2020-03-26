@@ -214,5 +214,3 @@ def test_monitor_skip_test_if(testdir):
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
     assert 2 == len(cursor.fetchall())  # current test + test_monitored
-
-
