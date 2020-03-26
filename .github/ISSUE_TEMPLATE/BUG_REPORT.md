@@ -19,14 +19,14 @@ Please answer the following questions **for yourself** before submitting an issu
 - [ ] I am running the latest version of `pytest-monitor`
 - [ ] I am running the latest version of `pytest` compatible with my current version of `pytest-monitor`
 - [ ] I checked the documentation and found no answer
-- [ ] I [checked](https://github.com/jsd-spif/pymonitor/issues?utf8=%E2%9C%93&q=is%3Aissue) to make sure that this issue has not already been filed
+- [ ] I [checked](https://github.com/CFMTech/pytest-monitor/issues?utf8=%E2%9C%93&q=is%3Aissue) to make sure that this issue has not already been filed
 - [ ] I'm reporting the issue to the correct repository (is your issue not a [`pytest`](https://github.com/pytest-dev/pytest/) issue ?)
 
 # Context
 
 Please provide any relevant information about your setup. This is important in case the issue is not reproducible except for under certain conditions.
 
-* `pytest-monitor` version (`master`, `develop` or a [numbered version](https://github.com/jsd-spif/pymonitor/releases)):
+* `pytest-monitor` version (`master` or a [numbered version](https://github.com/CFMTech/pytest-monitor/releases)):
 * `pytest` version (`master`, `develop` or a [numbered version](https://github.com/pytest-dev/pytest/releases)):
 ```python
 import pytest
@@ -67,7 +67,7 @@ Please include any relevant log snippets or files here.
 
 # Labels
 
-Correctly labelling your issue helps maintainers with triaging. Use such labels as [`Type: Bug`](https://github.com/jsd-spif/pymonitor/labels/Type%3A%20Bug), [`Type: Question`](https://github.com/jsd-spif/pymonitor/labels/Type%3A%20Question) or [`Type: Enhancement`](https://github.com/jsd-spif/pymonitor/labels/Type%3A%20Enhancement) for example.
-Depending on the criticality of your issue, you can also use the `Priority` labels [Critical](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20Critical), [High](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20High), [Medium](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20Medium) or [Low](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20Low).
+Correctly labelling your issue helps maintainers with triaging. Use such labels as [`Type: Bug`](https://github.com/CFMTech/pytest-monitor/labels/Type%3A%20Bug), [`Type: Question`](https://github.com/jsd-spif/pymonitor/labels/Type%3A%20Question) or [`Type: Enhancement`](https://github.com/CFMTech/pytest-monitor/labels/Type%3A%20Enhancement) for example.
+Depending on the criticality of your issue, you can also use the `Priority` labels [Critical](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20Critical), [High](https://github.com/CFMTech/pytest-monitor/labels/Priority%3A%20High), [Medium](https://github.com/CFMTech/pytest-monitor/labels/Priority%3A%20Medium) or [Low](https://github.com/CFMTech/pytest-monitor/labels/Priority%3A%20Low).
 
 Reporting issues is one way to contribute to `pytest-monitor`, so thanks for your help !
