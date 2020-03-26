@@ -36,8 +36,8 @@ If an option is not relevant to your PR, do not delete it but use ~strikethrough
 - [ ] New and existing unit tests pass locally with my changes (not just the [CI](https://link.to.ci))
 - [ ] Any dependent changes have been merged and published in downstream modules
 - [ ] I have provided a link to the issue this PR adresses in the Description section above (If there is none yet,
-[create one](https://github.com/jsd-spif/pymonitor/issues) !)
-- [ ] I have updated the [changelog](https://github.com/jsd-spif/pymonitor/blob/master/docs/sources/changelog.rst)
+[create one](https://github.com/CFMTech/pytest-monitor/issues) !)
+- [ ] I have updated the [changelog](https://github.com/CFMTech/pytest-monitor/blob/master/docs/sources/changelog.rst)
 - [ ] I have labeled my PR using appropriate tags (in particular using status labels like [`Status: Code Review Needed`](https://github.com/jsd-spif/pymonitor/labels/Status%3A%20Code%20Review%20Needed), [`Business: Test Needed`](https://github.com/jsd-spif/pymonitor/labels/Business%3A%20Test%20Needed) or [`Status: In Progress`](https://github.com/jsd-spif/pymonitor/labels/Status%3A%20In%20Progress) if you are still working on the PR)
 
 Do not forget to @ the people that needs to do the review
