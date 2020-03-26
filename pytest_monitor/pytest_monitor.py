@@ -169,43 +169,37 @@ def pytest_sessionstart(session):
     remote = None if session.config.option.mtr_none else session.config.option.remote
     PYTEST_MONITOR_SESSION = PyTestMonitorSession(db=db, remote=remote, component=component)
     PYTEST_MONITOR_SESSION.set_environment_info(ExecutionContext())
+    session.pytest_monitor = PYTEST_MONITOR_SESSION
     yield
-
-
-def scoper(scope, monitor_skip_flag, set_scope):
-    should_skip = monitor_skip_flag
-    if scope in set_scope and not should_skip:
-        global PYTEST_MONITOR_SESSION
-        return PYTEST_MONITOR_SESSION
-    return None
 
 
 @pytest.fixture(autouse=True, scope='module')
 def prf_module_tracer(request):
     t_a = time.time()
+    ptimes_a = request.session.pytest_monitor.process.cpu_times()
     yield
-    wrt = scoper('module', False, request.config.option.mtr_scope)
-    if wrt is not None:
-        t_z = time.time()
-        process = psutil.Process(os.getpid())
-        rss = process.memory_info().rss / 1024 ** 2
-        ptimes = process.cpu_times()
-        component = getattr(request.module, 'pytest_monitor_component', '')
-        wrt.add_test_info(request.module.__name__, 'module', component,
-                          t_a, t_z - t_a, ptimes.user, ptimes.system,
-                          rss)
+    ptimes_b = request.session.pytest_monitor.process.cpu_times()
+    t_z = time.time()
+    rss = request.session.pytest_monitor.process.memory_info().rss / 1024 ** 2
+    component = getattr(request.module, 'pytest_monitor_component', '')
+    request.session.pytest_monitor.add_test_info(request.module.__name__, 'module', request.config.option.mtr_scope,
+                                                 component, t_a, t_z - t_a,
+                                                 ptimes_b.user - ptimes_a.user,
+                                                 ptimes_b.system - ptimes_a.system,
+                                                 rss)
 
 
 @pytest.fixture(autouse=True)
 def prf_tracer(request):
+    ptimes_a = request.session.pytest_monitor.process.cpu_times()
     yield
-    wrt = scoper('function', request.node.monitor_skip_test, request.config.option.mtr_scope)
-    if wrt is not None:
-        process = psutil.Process(os.getpid())
-        ptimes = process.cpu_times()
-        if request.node.monitor_results:
-            full_item_name = f'{request.module.__name__}/{request.node.name}'
-            wrt.add_test_info(full_item_name, 'function', request.node.monitor_component,
-                              request.node.test_effective_start_time,
-                              request.node.test_run_duration,
-                              ptimes.user, ptimes.system, request.node.mem_usage)
+    ptimes_b = request.session.pytest_monitor.process.cpu_times()
+    if not request.node.monitor_skip_test and request.node.monitor_results:
+        full_item_name = f'{request.module.__name__}/{request.node.name}'
+        request.session.pytest_monitor.add_test_info(full_item_name, 'function', request.config.option.mtr_scope,
+                                                     request.node.monitor_component,
+                                                     request.node.test_effective_start_time,
+                                                     request.node.test_run_duration,
+                                                     ptimes_b.user - ptimes_a.user,
+                                                     ptimes_b.system - ptimes_a.system,
+                                                     request.node.mem_usage)
