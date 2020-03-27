@@ -20,6 +20,7 @@ PYTEST_MONITOR_VALID_MARKERS = {'monitor_skip_test': (False, 'monitor_skip_test'
                                 'monitor_test': (False, 'monitor_force_test', lambda x: True, False),
                                 'monitor_test_if': (True, 'monitor_force_test', lambda x: bool(x), False)}
 PYTEST_MONITOR_DEPRECATED_MARKERS = {}
+PYTEST_MONITOR_ITEM_LOC_MEMBER = '_location' if tuple(pytest.__version__.split('.')) < ('5', '3') else 'location'
 
 
 def pytest_addoption(parser):
@@ -196,8 +197,9 @@ def prf_tracer(request):
     ptimes_b = request.session.pytest_monitor.process.cpu_times()
     if not request.node.monitor_skip_test and request.node.monitor_results:
         item_name = request.node.originalname or request.node.name
+        item_loc = getattr(request.node, PYTEST_MONITOR_ITEM_LOC_MEMBER)[0]
         request.session.pytest_monitor.add_test_info(item_name, request.module.__name__,
-                                                     request.node.name, request.node._location[0],
+                                                     request.node.name, item_loc,
                                                      'function', request.config.option.mtr_scope,
                                                      request.node.monitor_component,
                                                      request.node.test_effective_start_time,
