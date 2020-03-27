@@ -114,6 +114,7 @@ workflows:
                     - pytestmonitor-py36-pytest51
                     - pytestmonitor-py36-pytest52
                     - pytestmonitor-py36-pytest53
+                    - pytestmonitor-py36-pytest54
                     - pytestmonitor-py37-pytest44
                     - pytestmonitor-py37-pytest45
                     - pytestmonitor-py37-pytest46
@@ -121,9 +122,11 @@ workflows:
                     - pytestmonitor-py37-pytest51
                     - pytestmonitor-py37-pytest52
                     - pytestmonitor-py37-pytest53
+                    - pytestmonitor-py37-pytest54
                     - pytestmonitor-py38-pytest46
                     - pytestmonitor-py38-pytest52
                     - pytestmonitor-py38-pytest53
+                    - pytestmonitor-py38-pytest54
                 filters:
                     tags:
                         only: /^[a-zA-Z].*/
@@ -177,6 +180,11 @@ jobs:
             CI_PYTHON: 'python=3.6'
             CI_PYTEST: 'pytest=5.3'
         <<: *shared
+    pytestmonitor-py36-pytest54:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=5.4'
+        <<: *shared
     pytestmonitor-py37-pytest44:
         environment:
             CI_PYTHON: 'python=3.7'
@@ -212,6 +220,11 @@ jobs:
             CI_PYTHON: 'python=3.7'
             CI_PYTEST: 'pytest=5.3'
         <<: *shared
+    pytestmonitor-py37-pytest54:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=5.4'
+        <<: *shared
     pytestmonitor-py38-pytest46:
         environment:
             CI_PYTHON: 'python=3.8'
@@ -226,6 +239,11 @@ jobs:
         environment:
             CI_PYTHON: 'python=3.8'
             CI_PYTEST: 'pytest=5.3'
+        <<: *shared
+    pytestmonitor-py38-pytest54:
+        environment:
+            CI_PYTHON: 'python=3.8'
+            CI_PYTEST: 'pytest=5.4'
         <<: *shared
     nightly_build:
         environment:
