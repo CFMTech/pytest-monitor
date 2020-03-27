@@ -83,8 +83,8 @@ class PyTestMonitorSession(object):
         if self.__db:
             self.__db.prepare()
 
-    def add_test_info(self, item, kind, allowed_scope, component, item_start_time, total_time,
-                      user_time, kernel_time, mem_usage):
+    def add_test_info(self, item, item_path, item_variant, item_loc, kind, allowed_scope, component,
+                      item_start_time, total_time, user_time, kernel_time, mem_usage):
         if kind not in allowed_scope:
             return
         mem_usage = float(mem_usage) - self.__mem_usage_base
@@ -93,9 +93,11 @@ class PyTestMonitorSession(object):
         final_component = self.__component.format(user_component=component)
         if final_component.endswith('.'):
             final_component = final_component[:-1]
+        item_variant = item_variant.replace('-', ', ')  # No choice
         if self.__db and self.db_env_id is not None:
-            self.__db.insert_metric(self.__run_date, item_start_time, self.db_env_id, self.__scm, item, kind,
-                                    final_component, total_time, user_time, kernel_time, cpu_usage, mem_usage)
+            self.__db.insert_metric(self.__run_date, item_start_time, self.db_env_id, self.__scm, item,
+                                    item_path, item_variant, item_loc, kind, final_component, total_time, user_time,
+                                    kernel_time, cpu_usage, mem_usage)
         if self.__remote and self.remote_env_id is not None:
             r = requests.post(f'{self.__remote}/metrics/',
                               json=dict(run_date=self.__run_date, context_h=self.remote_env_id, scm_ref=self.__scm,

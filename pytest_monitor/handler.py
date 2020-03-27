@@ -11,14 +11,16 @@ class DBHandler:
         cursor.execute(what, bind_to)
         return cursor.fetchall() if many else cursor.fetchone()
 
-    def insert_metric(self, run_date, item_start_date, env_id, scm_id, item, kind, component,
-                      total_time, user_time, kernel_time, cpu_usage, mem_usage):
+    def insert_metric(self, run_date, item_start_date, env_id, scm_id, item, item_path, item_variant,
+                      item_loc, kind, component, total_time, user_time, kernel_time, cpu_usage, mem_usage):
         with self.__cnx:
-            self.__cnx.execute(f'insert into TEST_METRICS(RUN_DATE,ITEM_START_TIME,ENV_H,SCM_ID,ITEM,KIND,'
-                               f'COMPONENT,TOTAL_TIME,USER_TIME,KERNEL_TIME,CPU_USAGE,MEM_USAGE) '
-                               f'values (?,?,?,?,?,?,?,?,?,?,?,?)',
-                               (run_date, item_start_date, env_id, scm_id, item, kind, component,
-                                total_time, user_time, kernel_time, cpu_usage, mem_usage))
+            self.__cnx.execute(f'insert into TEST_METRICS(RUN_DATE,ITEM_START_TIME,ENV_H,SCM_ID,ITEM,'
+                               f'ITEM_PATH,ITEM_VARIANT,ITEM_FS_LOC,KIND,COMPONENT,TOTAL_TIME,'
+                               f'USER_TIME,KERNEL_TIME,CPU_USAGE,MEM_USAGE) '
+                               f'values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                               (run_date, item_start_date, env_id, scm_id, item, item_path,
+                                item_variant, item_loc, kind, component, total_time, user_time,
+                                kernel_time, cpu_usage, mem_usage))
 
     def insert_execution_context(self, exc_context):
         with self.__cnx:
@@ -38,7 +40,10 @@ CREATE TABLE IF NOT EXISTS TEST_METRICS (
     ENV_H varchar(64), -- Environment description identifier
     SCM_ID varchar(128),
     ITEM_START_TIME varchar(64), -- Effective start time of the test
-    ITEM varchar(4096), -- Name of the item
+    ITEM_PATH varchar(4096), -- Path of the item, following Python import specification
+    ITEM varchar(2048), -- Name of the item
+    ITEM_VARIANT varchar(2048), -- Optional parametrization of an item.
+    ITEM_FS_LOC varchar(2048), -- Relative path from pytest invocation directory to the item's module.
     KIND varchar(64), -- Package, Module or function
     COMPONENT varchar(512) NULL, -- Tested component if any
     TOTAL_TIME float, -- Total time spent running the item

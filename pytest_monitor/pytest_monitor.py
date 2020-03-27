@@ -1,7 +1,6 @@
 import os
 # -*- coding: utf-8 -*-
 import memory_profiler
-import psutil
 import pytest
 import time
 import warnings
@@ -9,7 +8,6 @@ import warnings
 from pytest_monitor.sys_utils import ExecutionContext
 from pytest_monitor.session import PyTestMonitorSession
 
-PYTEST_MONITOR_SESSION = None
 # These dictionaries are used to compute members set on each items.
 # KEY is the marker set on a test function
 # value is a tuple:
@@ -135,7 +133,7 @@ def pytest_pyfunc_call(pyfuncitem):
 
     def prof():
         m = memory_profiler.memory_usage((wrapped_function, ()), max_usage=True, retval=True)
-        if isinstance(m[1], BaseException): # Do we have any outcome?
+        if isinstance(m[1], BaseException):  # Do we have any outcome?
             raise m[1]
         setattr(pyfuncitem, 'mem_usage', m[0])
         setattr(pyfuncitem, 'monitor_results', True)
@@ -145,7 +143,7 @@ def pytest_pyfunc_call(pyfuncitem):
 
 def pytest_make_parametrize_id(config, val, argname):
     if config.option.want_explicit_ids:
-        return f'{argname}_{val}'
+        return f'{argname}={val}'
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -154,7 +152,6 @@ def pytest_sessionstart(session):
     Instantiate a monitor session to save collected metrics.
     We yield at the end to let pytest pursue the execution.
     """
-    global PYTEST_MONITOR_SESSION
     if session.config.option.force_component and session.config.option.component_prefix:
         raise pytest.UsageError('Invalid usage: --force-component and --component-prefix are incompatible options!')
     if session.config.option.no_db and not session.config.option.remote and not session.config.option.mtr_none:
@@ -167,9 +164,8 @@ def pytest_sessionstart(session):
         component = '{user_component}'
     db = None if (session.config.option.mtr_none or session.config.option.no_db) else session.config.option.mtr_db_out
     remote = None if session.config.option.mtr_none else session.config.option.remote
-    PYTEST_MONITOR_SESSION = PyTestMonitorSession(db=db, remote=remote, component=component)
-    PYTEST_MONITOR_SESSION.set_environment_info(ExecutionContext())
-    session.pytest_monitor = PYTEST_MONITOR_SESSION
+    session.pytest_monitor = PyTestMonitorSession(db=db, remote=remote, component=component)
+    session.pytest_monitor.set_environment_info(ExecutionContext())
     yield
 
 
@@ -182,7 +178,11 @@ def prf_module_tracer(request):
     t_z = time.time()
     rss = request.session.pytest_monitor.process.memory_info().rss / 1024 ** 2
     component = getattr(request.module, 'pytest_monitor_component', '')
-    request.session.pytest_monitor.add_test_info(request.module.__name__, 'module', request.config.option.mtr_scope,
+    item = request.node.name[:-3]
+    pypath = request.module.__name__[:-len(item)-1]
+    request.session.pytest_monitor.add_test_info(item, pypath, '',
+                                                 request.node._nodeid,
+                                                 'module', request.config.option.mtr_scope,
                                                  component, t_a, t_z - t_a,
                                                  ptimes_b.user - ptimes_a.user,
                                                  ptimes_b.system - ptimes_a.system,
@@ -195,8 +195,10 @@ def prf_tracer(request):
     yield
     ptimes_b = request.session.pytest_monitor.process.cpu_times()
     if not request.node.monitor_skip_test and request.node.monitor_results:
-        full_item_name = f'{request.module.__name__}/{request.node.name}'
-        request.session.pytest_monitor.add_test_info(full_item_name, 'function', request.config.option.mtr_scope,
+        item_name = request.node.originalname or request.node.name
+        request.session.pytest_monitor.add_test_info(item_name, request.module.__name__,
+                                                     request.node.name, request.node._location[0],
+                                                     'function', request.config.option.mtr_scope,
                                                      request.node.monitor_component,
                                                      request.node.test_effective_start_time,
                                                      request.node.test_run_duration,
