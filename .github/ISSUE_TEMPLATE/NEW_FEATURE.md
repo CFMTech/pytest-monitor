@@ -22,7 +22,7 @@ Add any other context, screenshots links or example about the feature request he
 
 # Labels
 
-Correctly labelling your issue helps maintainers with triaging. Use such labels as [`Type: Question`](https://github.com/jsd-spif/pymonitor/labels/Type%3A%20Question) or [`Type: Enhancement`](https://github.com/jsd-spif/pymonitor/labels/Type%3A%20Enhancement) for example.
-Depending on the criticality of your issue, you can also use the `Priority` labels [Critical](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20Critical), [High](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20High), [Medium](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20Medium) or [Low](https://github.com/jsd-spif/pymonitor/labels/Priority%3A%20Low).
+Correctly labelling your issue helps maintainers with triaging. Use such labels as [`Type: Question`](https://github.com/CFMTech/pytest-monitor/labels/Type%3A%20Question) or [`Type: Enhancement`](https://github.com/CFMTech/pytest-monitor/labels/Type%3A%20Enhancement) for example.
+Depending on the criticality of your issue, you can also use the `Priority` labels [Critical](https://github.com/CFMTech/pytest-monitor/labels/Priority%3A%20Critical), [High](https://github.com/CFMTech/pytest-monitor/labels/Priority%3A%20High), [Medium](https://github.com/CFMTech/pytest-monitor/labels/Priority%3A%20Medium) or [Low](https://github.com/CFMTech/pytest-monitor/labels/Priority%3A%20Low).
 
 Proposing new features is a way to contribute to `pytest-monitor`, so thanks for your help !
