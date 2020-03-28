@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import json
 import memory_profiler
 import os
@@ -8,11 +9,11 @@ import subprocess
 import warnings
 
 from pytest_monitor.handler import DBHandler
+from pytest_monitor.sys_utils import ExecutionContext
 
 
 class PyTestMonitorSession(object):
     def __init__(self, db=None, remote=None, component=''):
-        self.__run_date = datetime.datetime.now().isoformat()
         self.__db = DBHandler(db) if db else None
         self.__remote = remote
         self.__component = component
@@ -55,8 +56,22 @@ class PyTestMonitorSession(object):
             p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             p_out, _ = p.communicate()
             if p.returncode == 0:
-                self.__scm = p_out.decode().split('\n')[0]
-                return
+                return p_out.decode().split('\n')[0]
+        return ''
+
+    def compute_infos(self, description):
+        self.set_environment_info(ExecutionContext())
+        scm = self.determine_scm_revision()
+        run_date = self.__run_date = datetime.datetime.now().isoformat()
+        h = hashlib.md5()
+        h.update(scm.encode())
+        h.update(run_date.encode())
+        h.update(description.encode())
+        md5 = h.hexdigest()
+        if self.__db and db_id is None:
+            self.__db.insert_session(scm, run_date, description, md5)
+        if self.__remote:
+            warnings.warn('todo')
 
     def set_environment_info(self, env):
         self.__eid = self.get_env_id(env)
@@ -73,7 +88,6 @@ class PyTestMonitorSession(object):
             else:
                 remote_id = json.loads(r.text)['h']
         self.__eid = db_id, remote_id
-        self.determine_scm_revision()
 
     def prepare(self):
         def dummy():

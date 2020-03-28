@@ -35,10 +35,16 @@ class DBHandler:
     def prepare(self):
         cursor = self.__cnx.cursor()
         cursor.execute('''
-CREATE TABLE IF NOT EXISTS TEST_METRICS (
+CREATE TABLE IF NOT EXISTS TEST_SESSIONS(
+    SESSION_H varchar(64) primary key not null unique, -- Session identifier
     RUN_DATE varchar(64), -- Date of test run
+    SCM_ID varchar(128), -- SCM change id 
+    RUN_DESCRIPTION varchar(1024),
+);''')
+        cursor.execute('''
+CREATE TABLE IF NOT EXISTS TEST_METRICS (
+    SESSION_H varchar(64), -- Session identifier
     ENV_H varchar(64), -- Environment description identifier
-    SCM_ID varchar(128),
     ITEM_START_TIME varchar(64), -- Effective start time of the test
     ITEM_PATH varchar(4096), -- Path of the item, following Python import specification
     ITEM varchar(2048), -- Name of the item
@@ -51,7 +57,8 @@ CREATE TABLE IF NOT EXISTS TEST_METRICS (
     KERNEL_TIME float, -- time spent in kernel space
     CPU_USAGE float, -- cpu usage
     MEM_USAGE float, -- Max resident memory used.
-    FOREIGN KEY (ENV_H) REFERENCES EXECUTION_CONTEXTS(ENV_H)
+    FOREIGN KEY (ENV_H) REFERENCES EXECUTION_CONTEXTS(ENV_H),
+    FOREIGN KEY (SESSION_H) REFERENCES TEST_SESSIONS(SESSION_H)
 );''')
         cursor.execute('''
 CREATE TABLE IF NOT EXISTS EXECUTION_CONTEXTS (

@@ -1,11 +1,9 @@
-import os
 # -*- coding: utf-8 -*-
 import memory_profiler
 import pytest
 import time
 import warnings
 
-from pytest_monitor.sys_utils import ExecutionContext
 from pytest_monitor.session import PyTestMonitorSession
 
 # These dictionaries are used to compute members set on each items.
@@ -44,6 +42,8 @@ def pytest_addoption(parser):
     group.addoption('--component-prefix', action='store',
                     help='Prefix each found components with the given value (applies to all tests'
                          ' run in this session).')
+    group.addoption('--description', action='store',
+                    help='Use this option to provide a small summary about this run.')
 
 
 def pytest_configure(config):
@@ -165,8 +165,9 @@ def pytest_sessionstart(session):
         component = '{user_component}'
     db = None if (session.config.option.mtr_none or session.config.option.no_db) else session.config.option.mtr_db_out
     remote = None if session.config.option.mtr_none else session.config.option.remote
-    session.pytest_monitor = PyTestMonitorSession(db=db, remote=remote, component=component)
-    session.pytest_monitor.set_environment_info(ExecutionContext())
+    session.pytest_monitor = PyTestMonitorSession(db=db, remote=remote,
+                                                  component=component)
+    session.pytest_monitor.compute_infos(session.config.option.description)
     yield
 
 
