@@ -8,6 +8,15 @@ import subprocess
 import sys
 
 
+def determine_scm_revision():
+    for cmd in [r'git rev-parse HEAD', r'p4 changes -m1 \#have']:
+        p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        p_out, _ = p.communicate()
+        if p.returncode == 0:
+            return p_out.decode().split('\n')[0]
+    return ''
+
+
 def _get_cpu_string():
     if platform.system().lower() == "darwin":
         old_path = os.environ['PATH']
