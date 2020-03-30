@@ -79,3 +79,14 @@ Disable monitoring
 If you need for some reason to disable the monitoring, pass the *\-\-no-trace* option.
 
 
+Adding a description to a run
+-----------------------------
+
+Sometimes, you might want to compare identical state of your code. In such cases, relying only on the scm
+references and the run date of the session. For that, `pytest-monitor` can assist you by adding a
+description field to your session.
+Setting a description is as simple as this:
+
+.. code-block:: shell
+
+    bash $> pytest --description "Any run description you want"
