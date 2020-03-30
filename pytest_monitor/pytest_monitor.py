@@ -1,11 +1,9 @@
-import os
 # -*- coding: utf-8 -*-
 import memory_profiler
 import pytest
 import time
 import warnings
 
-from pytest_monitor.sys_utils import ExecutionContext
 from pytest_monitor.session import PyTestMonitorSession
 
 # These dictionaries are used to compute members set on each items.
@@ -44,6 +42,8 @@ def pytest_addoption(parser):
     group.addoption('--component-prefix', action='store',
                     help='Prefix each found components with the given value (applies to all tests'
                          ' run in this session).')
+    group.addoption('--description', action='store', default='',
+                    help='Use this option to provide a small summary about this run.')
 
 
 def pytest_configure(config):
@@ -165,8 +165,10 @@ def pytest_sessionstart(session):
         component = '{user_component}'
     db = None if (session.config.option.mtr_none or session.config.option.no_db) else session.config.option.mtr_db_out
     remote = None if session.config.option.mtr_none else session.config.option.remote
-    session.pytest_monitor = PyTestMonitorSession(db=db, remote=remote, component=component)
-    session.pytest_monitor.set_environment_info(ExecutionContext())
+    session.pytest_monitor = PyTestMonitorSession(db=db, remote=remote,
+                                                  component=component,
+                                                  scope=session.config.option.mtr_scope)
+    session.pytest_monitor.compute_info(session.config.option.description)
     yield
 
 
@@ -183,7 +185,7 @@ def prf_module_tracer(request):
     pypath = request.module.__name__[:-len(item)-1]
     request.session.pytest_monitor.add_test_info(item, pypath, '',
                                                  request.node._nodeid,
-                                                 'module', request.config.option.mtr_scope,
+                                                 'module',
                                                  component, t_a, t_z - t_a,
                                                  ptimes_b.user - ptimes_a.user,
                                                  ptimes_b.system - ptimes_a.system,
@@ -200,7 +202,7 @@ def prf_tracer(request):
         item_loc = getattr(request.node, PYTEST_MONITOR_ITEM_LOC_MEMBER)[0]
         request.session.pytest_monitor.add_test_info(item_name, request.module.__name__,
                                                      request.node.name, item_loc,
-                                                     'function', request.config.option.mtr_scope,
+                                                     'function',
                                                      request.node.monitor_component,
                                                      request.node.test_effective_start_time,
                                                      request.node.test_run_duration,

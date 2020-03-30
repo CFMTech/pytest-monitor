@@ -1,26 +1,26 @@
 import datetime
+import hashlib
 import json
 import memory_profiler
 import os
 import psutil
 import requests
-import subprocess
 import warnings
 
 from pytest_monitor.handler import DBHandler
+from pytest_monitor.sys_utils import ExecutionContext, determine_scm_revision
 
 
 class PyTestMonitorSession(object):
-    def __init__(self, db=None, remote=None, component=''):
-        self.__run_date = datetime.datetime.now().isoformat()
+    def __init__(self, db=None, remote=None, component='', scope=None):
         self.__db = DBHandler(db) if db else None
         self.__remote = remote
         self.__component = component
-        self.__scm = ''
+        self.__session = ''
+        self.__scope = scope or []
         self.__eid = (None, None)
         self.__mem_usage_base = None
         self.__process = psutil.Process(os.getpid())
-        self.prepare()
 
     @property
     def remote_env_id(self):
@@ -50,13 +50,21 @@ class PyTestMonitorSession(object):
                     remote = None
         return db, remote
 
-    def determine_scm_revision(self):
-        for cmd in [r'git rev-parse HEAD', r'p4 changes -m1 \#have']:
-            p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            p_out, _ = p.communicate()
-            if p.returncode == 0:
-                self.__scm = p_out.decode().split('\n')[0]
-                return
+    def compute_info(self, description):
+        run_date = datetime.datetime.now().isoformat()
+        scm = determine_scm_revision()
+        h = hashlib.md5()
+        h.update(scm.encode())
+        h.update(run_date.encode())
+        h.update(description.encode())
+        self.__session = h.hexdigest()
+        # Now get memory usage base and create the database
+        self.prepare()
+        self.set_environment_info(ExecutionContext())
+        if self.__db:
+            self.__db.insert_session(self.__session, run_date, scm, description)
+        if self.__remote:
+            warnings.warn('todo')
 
     def set_environment_info(self, env):
         self.__eid = self.get_env_id(env)
@@ -73,19 +81,16 @@ class PyTestMonitorSession(object):
             else:
                 remote_id = json.loads(r.text)['h']
         self.__eid = db_id, remote_id
-        self.determine_scm_revision()
 
     def prepare(self):
         def dummy():
             return True
 
         self.__mem_usage_base = memory_profiler.memory_usage((dummy,), max_usage=True)
-        if self.__db:
-            self.__db.prepare()
 
-    def add_test_info(self, item, item_path, item_variant, item_loc, kind, allowed_scope, component,
+    def add_test_info(self, item, item_path, item_variant, item_loc, kind, component,
                       item_start_time, total_time, user_time, kernel_time, mem_usage):
-        if kind not in allowed_scope:
+        if kind not in self.__scope:
             return
         mem_usage = float(mem_usage) - self.__mem_usage_base
         cpu_usage = (user_time + kernel_time) / total_time
@@ -95,12 +100,12 @@ class PyTestMonitorSession(object):
             final_component = final_component[:-1]
         item_variant = item_variant.replace('-', ', ')  # No choice
         if self.__db and self.db_env_id is not None:
-            self.__db.insert_metric(self.__run_date, item_start_time, self.db_env_id, self.__scm, item,
+            self.__db.insert_metric(self.__session, self.db_env_id, item_start_time, item,
                                     item_path, item_variant, item_loc, kind, final_component, total_time, user_time,
                                     kernel_time, cpu_usage, mem_usage)
         if self.__remote and self.remote_env_id is not None:
             r = requests.post(f'{self.__remote}/metrics/',
-                              json=dict(run_date=self.__run_date, context_h=self.remote_env_id, scm_ref=self.__scm,
+                              json=dict(context_h=self.remote_env_id,
                                         item=item, kind=kind, component=final_component, total_time=total_time,
                                         item_start_time=item_start_time, user_time=user_time,
                                         kernel_time=kernel_time,

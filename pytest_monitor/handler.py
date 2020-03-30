@@ -5,20 +5,27 @@ class DBHandler:
     def __init__(self, db_path):
         self.__db = db_path
         self.__cnx = sqlite3.connect(self.__db) if db_path else None
+        self.prepare()
 
     def query(self, what, bind_to, many=False):
         cursor = self.__cnx.cursor()
         cursor.execute(what, bind_to)
         return cursor.fetchall() if many else cursor.fetchone()
 
-    def insert_metric(self, run_date, item_start_date, env_id, scm_id, item, item_path, item_variant,
+    def insert_session(self, h, run_date, scm_id, description):
+        with self.__cnx:
+            self.__cnx.execute(f'insert into TEST_SESSIONS(SESSION_H, RUN_DATE, SCM_ID, RUN_DESCRIPTION)'
+                               f' values (?,?,?,?)',
+                               (h, run_date, scm_id, description))
+
+    def insert_metric(self, session_id, env_id, item_start_date, item, item_path, item_variant,
                       item_loc, kind, component, total_time, user_time, kernel_time, cpu_usage, mem_usage):
         with self.__cnx:
-            self.__cnx.execute(f'insert into TEST_METRICS(RUN_DATE,ITEM_START_TIME,ENV_H,SCM_ID,ITEM,'
+            self.__cnx.execute(f'insert into TEST_METRICS(SESSION_H,ENV_H,ITEM_START_TIME,ITEM,'
                                f'ITEM_PATH,ITEM_VARIANT,ITEM_FS_LOC,KIND,COMPONENT,TOTAL_TIME,'
                                f'USER_TIME,KERNEL_TIME,CPU_USAGE,MEM_USAGE) '
-                               f'values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-                               (run_date, item_start_date, env_id, scm_id, item, item_path,
+                               f'values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                               (session_id, env_id, item_start_date, item, item_path,
                                 item_variant, item_loc, kind, component, total_time, user_time,
                                 kernel_time, cpu_usage, mem_usage))
 
@@ -35,10 +42,16 @@ class DBHandler:
     def prepare(self):
         cursor = self.__cnx.cursor()
         cursor.execute('''
-CREATE TABLE IF NOT EXISTS TEST_METRICS (
+CREATE TABLE IF NOT EXISTS TEST_SESSIONS(
+    SESSION_H varchar(64) primary key not null unique, -- Session identifier
     RUN_DATE varchar(64), -- Date of test run
+    SCM_ID varchar(128), -- SCM change id 
+    RUN_DESCRIPTION varchar(1024)
+);''')
+        cursor.execute('''
+CREATE TABLE IF NOT EXISTS TEST_METRICS (
+    SESSION_H varchar(64), -- Session identifier
     ENV_H varchar(64), -- Environment description identifier
-    SCM_ID varchar(128),
     ITEM_START_TIME varchar(64), -- Effective start time of the test
     ITEM_PATH varchar(4096), -- Path of the item, following Python import specification
     ITEM varchar(2048), -- Name of the item
@@ -51,7 +64,8 @@ CREATE TABLE IF NOT EXISTS TEST_METRICS (
     KERNEL_TIME float, -- time spent in kernel space
     CPU_USAGE float, -- cpu usage
     MEM_USAGE float, -- Max resident memory used.
-    FOREIGN KEY (ENV_H) REFERENCES EXECUTION_CONTEXTS(ENV_H)
+    FOREIGN KEY (ENV_H) REFERENCES EXECUTION_CONTEXTS(ENV_H),
+    FOREIGN KEY (SESSION_H) REFERENCES TEST_SESSIONS(SESSION_H)
 );''')
         cursor.execute('''
 CREATE TABLE IF NOT EXISTS EXECUTION_CONTEXTS (
