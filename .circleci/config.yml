@@ -65,6 +65,10 @@ workflows:
                 filters:
                     tags:
                         only: /.*/
+            - pytestmonitor-py36-pytest54:
+                  filters:
+                      tags:
+                          only: /.*/
             - pytestmonitor-py37-pytest44:
                 filters:
                     tags:
@@ -93,6 +97,10 @@ workflows:
                 filters:
                     tags:
                         only: /.*/
+            - pytestmonitor-py37-pytest54:
+                  filters:
+                      tags:
+                          only: /.*/
             - pytestmonitor-py38-pytest46:
                 filters:
                     tags:
@@ -102,9 +110,13 @@ workflows:
                     tags:
                         only: /.*/
             - pytestmonitor-py38-pytest53:
-                filters:
-                    tags:
-                        only: /.*/
+              filters:
+                  tags:
+                      only: /.*/
+            - pytestmonitor-py38-pytest54:
+                  filters:
+                      tags:
+                          only: /.*/
             - deploy:
                 requires:
                     - pytestmonitor-py36-pytest44
