@@ -64,7 +64,16 @@ class PyTestMonitorSession(object):
         if self.__db:
             self.__db.insert_session(self.__session, run_date, scm, description)
         if self.__remote:
-            warnings.warn('todo')
+            r = requests.post(f'{self.__remote}/sessions/',
+                              json=dict(session_h=self.__session,
+                                        run_date=run_date,
+                                        scm_ref=scm,
+                                        description=description))
+            if r.status_code != 200:
+                self.__remote = ''
+                msg = f"Cannot insert session in remote monitor server ({r.status_code})! Deactivating...')"
+                warnings.warn(msg)
+
 
     def set_environment_info(self, env):
         self.__eid = self.get_env_id(env)
@@ -105,13 +114,21 @@ class PyTestMonitorSession(object):
                                     kernel_time, cpu_usage, mem_usage)
         if self.__remote and self.remote_env_id is not None:
             r = requests.post(f'{self.__remote}/metrics/',
-                              json=dict(context_h=self.remote_env_id,
-                                        item=item, kind=kind, component=final_component, total_time=total_time,
-                                        item_start_time=item_start_time, user_time=user_time,
+                              json=dict(session_h=self.__session,
+                                        context_h=self.remote_env_id,
+                                        item_start_time=item_start_time,
+                                        item_path=item_path,
+                                        item=item,
+                                        item_variant=item_variant,
+                                        item_fs_loc=item_loc,
+                                        kind=kind,
+                                        component=final_component,
+                                        total_time=total_time,
+                                        user_time=user_time,
                                         kernel_time=kernel_time,
-                                        cpu_usage=cpu_usage, mem_usage=mem_usage))
+                                        cpu_usage=cpu_usage,
+                                        mem_usage=mem_usage))
             if r.status_code != 200:
-                print(r.text)
                 self.__remote = ''
                 msg = f"Cannot insert values in remote monitor server ({r.status_code})! Deactivating...')"
                 warnings.warn(msg)
