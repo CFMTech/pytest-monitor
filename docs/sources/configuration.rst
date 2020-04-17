@@ -9,7 +9,7 @@ Scope Restriction
 -----------------
 
 `pytest-monitor` is able to restrict the scope of the analysis. As a default, 
-any test object discovered by pytest is monitored (test functions and test classes).
+only tests functions discovered by pytest are monitored.
 
 Sometime, you might want to monitor a whole module or test session. This can be
 achieved thanks to the *\-\-restrict-scope-to* option. 

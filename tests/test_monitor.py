@@ -33,7 +33,7 @@ def test_monitor_basic_test(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 2 == len(cursor.fetchall())  # current test + test_ok
+    assert 1 == len(cursor.fetchall())  # current test
 
 
 def test_monitor_pytest_skip_marker(testdir):
@@ -100,7 +100,7 @@ def test_bad_markers(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 2 == len(cursor.fetchall())  # current test + test_ok
+    assert 1 == len(cursor.fetchall())  # current test
 
 
 def test_monitor_skip_module(testdir):
@@ -137,7 +137,7 @@ def test_another_function_ok_not_monitored():
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 1 == len(cursor.fetchall())  # current test + test_ok
+    assert not len(cursor.fetchall())  # Nothing ran
 
 
 def test_monitor_skip_test(testdir):
@@ -171,7 +171,7 @@ def test_monitor_skip_test(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 1 == len(cursor.fetchall())  # current test + test_ok
+    assert not len(cursor.fetchall())  # nothing monitored
 
 
 def test_monitor_skip_test_if(testdir):
@@ -214,7 +214,7 @@ def test_monitor_skip_test_if(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 2 == len(cursor.fetchall())  # current test + test_monitored
+    assert 1 == len(cursor.fetchall())
 
 
 def test_monitor_no_db(testdir):
