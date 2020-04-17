@@ -23,7 +23,7 @@ PYTEST_MONITOR_ITEM_LOC_MEMBER = '_location' if tuple(pytest.__version__.split('
 
 def pytest_addoption(parser):
     group = parser.getgroup('monitor')
-    group.addoption('--restrict-scope-to', dest='mtr_scope', default='function,module',
+    group.addoption('--restrict-scope-to', dest='mtr_scope', default='function',
                     help='Select the scope to monitor. By default, only function is monitored.'
                          'Values are function, class, module, session. You can set one or more of these'
                          'by listing them using a comma separated list')

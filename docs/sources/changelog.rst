@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`1.2.0 <2020-04-17>`
+* :feature:`13` Change default analysis scope to function.
+
 * :release:`1.1.1 <2020-03-31>`
 * :bug:`9` Fix remote server interface for sending measures.
 
