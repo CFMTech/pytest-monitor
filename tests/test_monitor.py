@@ -215,3 +215,41 @@ def test_monitor_skip_test_if(testdir):
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
     assert 1 == len(cursor.fetchall())
+
+
+def test_monitor_no_db(testdir):
+    """Make sure that pytest-monitor correctly understand the monitor_skip_test_if marker."""
+
+    # create a temporary pytest test module
+    testdir.makepyfile("""
+    import pytest
+    import time
+
+
+    def test_it():
+        time.sleep(0.1)
+        x = ['a' * i for i in range(100)]
+        assert len(x) == 100
+
+
+    def test_that():
+        time.sleep(0.1)
+        x = ['a' *i for i in range(100)]
+        assert len(x) == 100
+
+""")
+
+    wrn = 'pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring.'
+    with pytest.warns(UserWarning, match=wrn):
+        # run pytest with the following cmd args
+        result = testdir.runpytest('--no-db', '-v')
+
+    # fnmatch_lines does an assertion internally
+    result.stdout.fnmatch_lines(['*::test_it PASSED*',
+                                 '*::test_that PASSED*'])
+
+    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    assert not pymon_path.exists()
+
+    # make sure that that we get a '0' exit code for the testsuite
+    result.assert_outcomes(passed=2)

@@ -13,7 +13,9 @@ from pytest_monitor.sys_utils import ExecutionContext, determine_scm_revision
 
 class PyTestMonitorSession(object):
     def __init__(self, db=None, remote=None, component='', scope=None):
-        self.__db = DBHandler(db) if db else None
+        self.__db = None
+        if db:
+            self.__db = DBHandler(db)
         self.__remote = remote
         self.__component = component
         self.__session = ''
@@ -73,7 +75,6 @@ class PyTestMonitorSession(object):
                 self.__remote = ''
                 msg = f"Cannot insert session in remote monitor server ({r.status_code})! Deactivating...')"
                 warnings.warn(msg)
-
 
     def set_environment_info(self, env):
         self.__eid = self.get_env_id(env)
