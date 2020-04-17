@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pathlib
+import pytest
 import sqlite3
 
 
