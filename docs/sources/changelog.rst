@@ -4,6 +4,8 @@ Changelog
 
 * :release:`1.2.0 <2020-04-17>`
 * :feature:`13` Change default analysis scope to function.
+* :bug:`12 major` No execution contexts pushed when using a remote server.
+* :bug:`14 major` A local database is always created even with --no-db option passed.
 
 * :release:`1.1.1 <2020-03-31>`
 * :bug:`9` Fix remote server interface for sending measures.
