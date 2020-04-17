@@ -40,7 +40,7 @@ class PyTestMonitorSession(object):
             row = self.__db.query('SELECT ENV_H FROM EXECUTION_CONTEXTS WHERE ENV_H= ?', (env.hash(),))
             db = row[0] if row else None
         if self.__remote:
-            r = requests.get(f'{self.__remote}/contexts', params=dict(environ_hash=env.hash()))
+            r = requests.get(f'{self.__remote}/contexts/{env.hash()}')
             remote = None
             if r.status_code == 200:
                 remote = json.loads(r.text)
