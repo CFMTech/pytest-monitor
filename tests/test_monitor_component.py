@@ -34,7 +34,7 @@ def test_monitor_no_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 2 == len(cursor.fetchall())  # current test + test_ok
+    assert 1 == len(cursor.fetchall())
     cursor.execute("SELECT ITEM FROM TEST_METRICS WHERE COMPONENT != '' AND ITEM LIKE '%test_ok';")
     assert not len(cursor.fetchall())
 
@@ -55,7 +55,7 @@ def test_monitor_force_component(testdir):
 """)
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('--force-component','my_component', '-v')
+    result = testdir.runpytest('--force-component', 'my_component', '-v')
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(['*::test_force_ok PASSED*'])
@@ -69,7 +69,7 @@ def test_monitor_force_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 2 == len(cursor.fetchall())  # current test + test_ok
+    assert 1 == len(cursor.fetchall())
     cursor.execute("SELECT ITEM FROM TEST_METRICS"
                    " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_force_ok%';")
     assert 1 == len(cursor.fetchall())
@@ -106,10 +106,10 @@ def test_monitor_prefix_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 2 == len(cursor.fetchall())  # current test + test_ok
+    assert 1 == len(cursor.fetchall())
     cursor.execute("SELECT ITEM FROM TEST_METRICS"
                    " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';")
-    assert 0 == len(cursor.fetchall())
+    assert not len(cursor.fetchall())
     cursor.execute("SELECT ITEM FROM TEST_METRICS"
                    " WHERE COMPONENT == 'my_component.internal' AND ITEM LIKE '%test_prefix_ok%';")
     assert 1 == len(cursor.fetchall())
@@ -145,7 +145,7 @@ def test_monitor_prefix_without_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
-    assert 2 == len(cursor.fetchall())  # current test + test_ok
+    assert 1 == len(cursor.fetchall())
     cursor.execute("SELECT ITEM FROM TEST_METRICS"
                    " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';")
     assert 1 == len(cursor.fetchall())
