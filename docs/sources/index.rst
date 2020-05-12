@@ -16,6 +16,7 @@ Contents:
    configuration
    run
    exploitation
+   remote
    contributing 
    changelog
 
