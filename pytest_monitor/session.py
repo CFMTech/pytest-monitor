@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import datetime
 import hashlib
 import json
@@ -44,7 +46,7 @@ class PyTestMonitorSession(object):
         if self.__remote:
             r = requests.get(f'{self.__remote}/contexts/{env.hash()}')
             remote = None
-            if r.status_code == 200:
+            if r.status_code == HTTPStatus.OK:
                 remote = json.loads(r.text)
                 if remote['contexts']:
                     remote = remote['contexts'][0]['h']
@@ -71,7 +73,7 @@ class PyTestMonitorSession(object):
                                         run_date=run_date,
                                         scm_ref=scm,
                                         description=description))
-            if r.status_code != 200:
+            if r.status_code != HTTPStatus.CREATED:
                 self.__remote = ''
                 msg = f"Cannot insert session in remote monitor server ({r.status_code})! Deactivating...')"
                 warnings.warn(msg)
@@ -85,7 +87,7 @@ class PyTestMonitorSession(object):
         if self.__remote and remote_id is None:
             # We must postpone that to be run at the end of the pytest session.
             r = requests.post(f'{self.__remote}/contexts/', json=env.to_dict())
-            if r.status_code != 200:
+            if r.status_code != HTTPStatus.CREATED:
                 warnings.warn(f'Cannot insert execution context in remote server (rc={r.status_code}! Deactivating...')
                 self.__remote = ''
             else:
@@ -129,7 +131,7 @@ class PyTestMonitorSession(object):
                                         kernel_time=kernel_time,
                                         cpu_usage=cpu_usage,
                                         mem_usage=mem_usage))
-            if r.status_code != 200:
+            if r.status_code != HTTPStatus.CREATED:
                 self.__remote = ''
                 msg = f"Cannot insert values in remote monitor server ({r.status_code})! Deactivating...')"
                 warnings.warn(msg)

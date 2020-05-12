@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`1.3.0 <2020-05-12>`
+* :feature:`19` Normalized http codes used for sending metrics to a remote server.
+
 * :release:`1.2.0 <2020-04-17>`
 * :feature:`13` Change default analysis scope to function.
 * :bug:`12 major` No execution contexts pushed when using a remote server.
