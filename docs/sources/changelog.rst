@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`1.4.0 <2020-06-04>`
+* :feature:`21` Using json format to populate the RUN_DESCRIPTION field (through --description and --tag fields)
+
 * :release:`1.3.0 <2020-05-12>`
 * :feature:`19` Normalized http codes used for sending metrics to a remote server.
 

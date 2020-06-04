@@ -83,10 +83,45 @@ Adding a description to a run
 -----------------------------
 
 Sometimes, you might want to compare identical state of your code. In such cases, relying only on the scm
-references and the run date of the session. For that, `pytest-monitor` can assist you by adding a
-description field to your session.
+references and the run date of the session. For that, `pytest-monitor` can assist you by tagging
+your session using description and tags.
+The description should be used to provide a brief summary of your run while tags can be used to
+set special information you want to focus during your analysis. 
 Setting a description is as simple as this:
 
 .. code-block:: shell
 
     bash $> pytest --description "Any run description you want"
+
+
+Flagging your session with specific information is as complex as setting the description:
+
+.. code-block:: shell
+
+    bash $> pytest --tag pandas=1.0.1 --tag numpy=1.17
+
+This will result in a session with the following description:
+
+.. code-block:: text
+
+    {
+        "pandas": "1.0.1",
+        "numpy": "1.17"
+    }
+
+
+You can perfectly use both options to fully describe your session:
+
+.. code-block:: shell
+
+    bash $> pytest --tag pandas=1.0.1 --tag numpy=1.17 --description "Your summary"
+
+This will result in a session with the following description:
+
+.. code-block:: text
+
+    {
+        "msg": "Your summary",
+        "pandas": "1.0.1",
+        "numpy": "1.17"
+    }

@@ -54,7 +54,7 @@ class PyTestMonitorSession(object):
                     remote = None
         return db, remote
 
-    def compute_info(self, description):
+    def compute_info(self, description, tags):
         run_date = datetime.datetime.now().isoformat()
         scm = determine_scm_revision()
         h = hashlib.md5()
@@ -62,6 +62,19 @@ class PyTestMonitorSession(object):
         h.update(run_date.encode())
         h.update(description.encode())
         self.__session = h.hexdigest()
+        # From description + tags to JSON format
+        d=dict()
+        if description:
+            d['description'] = description
+        for tag in tags:
+            if type(tag) is str:
+                _tag_info = tag.split('=', 1)
+                d[_tag_info[0]] = _tag_info[1]
+            else:
+                for sub_tag in tag:
+                    _tag_info = subtag.split('=', 1)
+                    d[_tag_info[0]] = _tag_info[1]
+        description = json.dumps(d)
         # Now get memory usage base and create the database
         self.prepare()
         self.set_environment_info(ExecutionContext())

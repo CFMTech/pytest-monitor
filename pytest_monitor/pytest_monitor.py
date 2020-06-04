@@ -27,23 +27,25 @@ def pytest_addoption(parser):
                     help='Select the scope to monitor. By default, only function is monitored.'
                          'Values are function, class, module, session. You can set one or more of these'
                          'by listing them using a comma separated list')
-    group.addoption('--parametrization-explicit', dest='want_explicit_ids', action='store_true',
+    group.addoption('--parametrization-explicit', dest='mtr_want_explicit_ids', action='store_true',
                     help='Set this option to distinguish parametrized tests given their values.'
                          ' This requires the parameters to be stringifiable.')
     group.addoption('--no-monitor', action='store_true', dest='mtr_none', help='Disable all traces')
-    group.addoption('--remote', action='store', dest='remote',
+    group.addoption('--remote', action='store', dest='mtr_remote',
                     help='Remote server to send the results to. Format is <ADRESS>:<PORT>')
     group.addoption('--db', action='store', dest='mtr_db_out', default='.pymon',
                     help='Use the given sqlite database for storing results.')
-    group.addoption('--no-db', action='store_true', help='Do not store results in local db.')
-    group.addoption('--force-component', action='store',
+    group.addoption('--no-db', action='store_true', dest='mtr_no_db', help='Do not store results in local db.')
+    group.addoption('--force-component', action='store', dest='mtr_force_component', 
                     help='Force the component to be set at the given value for the all tests run'
                          ' in this session.')
-    group.addoption('--component-prefix', action='store',
+    group.addoption('--component-prefix', action='store', dest='mtr_component_prefix',
                     help='Prefix each found components with the given value (applies to all tests'
                          ' run in this session).')
-    group.addoption('--description', action='store', default='',
+    group.addoption('--description', action='store', default='', dest='mtr_description',
                     help='Use this option to provide a small summary about this run.')
+    group.addoption('--tag', action='append', dest='mtr_tags', default=[],
+                    help='Provide meaningfull flags to your run. This can help you in your analysis.')
 
 
 def pytest_configure(config):
@@ -143,7 +145,7 @@ def pytest_pyfunc_call(pyfuncitem):
 
 
 def pytest_make_parametrize_id(config, val, argname):
-    if config.option.want_explicit_ids:
+    if config.option.mtr_want_explicit_ids:
         return f'{argname}={val}'
 
 
@@ -153,22 +155,23 @@ def pytest_sessionstart(session):
     Instantiate a monitor session to save collected metrics.
     We yield at the end to let pytest pursue the execution.
     """
-    if session.config.option.force_component and session.config.option.component_prefix:
+    if session.config.option.mtr_force_component and session.config.option.mtr_component_prefix:
         raise pytest.UsageError('Invalid usage: --force-component and --component-prefix are incompatible options!')
-    if session.config.option.no_db and not session.config.option.remote and not session.config.option.mtr_none:
+    if session.config.option.mtr_no_db and not session.config.option.mtr_remote and not session.config.option.mtr_none:
         warnings.warn('pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring.')
         session.config.option.mtr_none = True
-    component = session.config.option.force_component or session.config.option.component_prefix 
-    if session.config.option.component_prefix:
+    component = session.config.option.mtr_force_component or session.config.option.mtr_component_prefix 
+    if session.config.option.mtr_component_prefix:
         component += '.{user_component}'
     if not component:
         component = '{user_component}'
-    db = None if (session.config.option.mtr_none or session.config.option.no_db) else session.config.option.mtr_db_out
-    remote = None if session.config.option.mtr_none else session.config.option.remote
+    db = None if (session.config.option.mtr_none or session.config.option.mtr_no_db) else session.config.option.mtr_db_out
+    remote = None if session.config.option.mtr_none else session.config.option.mtr_remote
     session.pytest_monitor = PyTestMonitorSession(db=db, remote=remote,
                                                   component=component,
                                                   scope=session.config.option.mtr_scope)
-    session.pytest_monitor.compute_info(session.config.option.description)
+    session.pytest_monitor.compute_info(session.config.option.mtr_description,
+                                        session.config.option.mtr_tags)
     yield
 
 
