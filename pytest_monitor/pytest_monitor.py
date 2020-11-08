@@ -118,11 +118,13 @@ def pytest_runtest_call(item):
     setattr(item, 'monitor_component', getattr(item.module, 'pytest_monitor_component', ''))
 
 
+@pytest.hookimpl
 def pytest_pyfunc_call(pyfuncitem):
     """
     Core sniffer logic. We encapsulate the test function in a sniffer function to collect
     memory results.
     """
+    yield  # Follow hook definition and avoid repetition of output if any.
 
     def wrapped_function():
         try:

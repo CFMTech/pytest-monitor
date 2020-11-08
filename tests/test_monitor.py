@@ -253,3 +253,28 @@ def test_monitor_no_db(testdir):
 
     # make sure that that we get a '0' exit code for the testsuite
     result.assert_outcomes(passed=2)
+
+
+def test_monitor_basic_output(testdir):
+    """Make sure that pytest-monitor does not repeat captured output (issue #26)."""
+
+    # create a temporary pytest test module
+    testdir.makepyfile("""
+        def test_it():
+            print('Hello World')
+    """)
+
+    wrn = 'pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring.'
+    with pytest.warns(UserWarning, match=wrn):
+        # run pytest with the following cmd args
+        result = testdir.runpytest('--no-db', '-s', '-vv')
+
+    # fnmatch_lines does an assertion internally
+    result.stdout.fnmatch_lines(['*::test_it PASSED*'])
+    result.stdout.fnmatch_lines(['Hello World'])
+    assert 'Hello World' != result.stdout.get_lines_after('Hello World')[0]
+    print(result.stdout)
+    print(result.stdout.get_lines_after('Hello World'))
+
+    # make sure that that we get a '0' exit code for the testsuite
+    result.assert_outcomes(passed=2)
