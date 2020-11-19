@@ -137,7 +137,8 @@ def pytest_pyfunc_call(pyfuncitem):
             return e
 
     def prof():
-        m = memory_profiler.memory_usage((wrapped_function, ()), max_usage=True, retval=True)
+        m = memory_profiler.memory_usage((wrapped_function, ()),
+                                         max_iterations=1, max_usage=True, retval=True)
         if isinstance(m[1], BaseException):  # Do we have any outcome?
             raise m[1]
         setattr(pyfuncitem, 'mem_usage', m[0])

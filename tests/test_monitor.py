@@ -274,6 +274,7 @@ def test_monitor_basic_output(testdir):
     result.stdout.fnmatch_lines(['Hello World'])
     assert 'Hello World' != result.stdout.get_lines_after('Hello World')[0]
     print(result.stdout)
+    print('------')
     print(result.stdout.get_lines_after('Hello World'))
 
     # make sure that that we get a '0' exit code for the testsuite
