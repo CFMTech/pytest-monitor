@@ -137,6 +137,7 @@ extracted from the CI build. For that purpose, pytest-monitor reads the environm
 at the start of the test session in search for:
  * **pipeline_branch**, which can either represent a CI pipeline name (preferentially) or the source code branch name.
  * **pipeline_build_no**, which is the pipeline build number (if available) or the pipeline ID if any.
+ * **__ci__** which provides you the ci system used.
 
 Currently, pytest-monitor supports the following CI:
  * Gitlab CI
@@ -147,19 +148,19 @@ Currently, pytest-monitor supports the following CI:
 
 The following table explains how both fields are mapped:
 
-+--------------+-----------------------------------+-----------------------+
-|       CI     |     pipeline_branch               | pipeline_build_no     |
-+==============+===================================+=======================+
-|  Jenkins CI  |  BRANCH_NAME if set else JOB_NAME | BUILD_NUMBER          |
-+--------------+-----------------------------------+-----------------------+
-|  Drone CI    |  DRONE_REPO_BRANCH                | DRONE_BUILD_NUMBER    |
-+--------------+-----------------------------------+-----------------------+
-|  Circle CI   |  CIRCLE_JOB                       | CIRCLE_BUILD_NUM      |
-+--------------+-----------------------------------+-----------------------+
-|  Gitlab CI   |  CI_JOB_NAME                      | CI_PIPELINE_ID        |
-+--------------+-----------------------------------+-----------------------+
-|  Travis CI   |  TRAVIS_BUILD_ID                  | TRAVIS_BUILD_NUMBER   |
-+--------------+-----------------------------------+-----------------------+
++--------------+-----------------------------------+-----------------------+---------------+
+|       CI     |     pipeline_branch               | pipeline_build_no     |  __ci__       |
++==============+===================================+=======================+===============+
+|  Jenkins CI  |  BRANCH_NAME if set else JOB_NAME | BUILD_NUMBER          |   jenkinsci   |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Drone CI    |  DRONE_REPO_BRANCH                | DRONE_BUILD_NUMBER    |   droneci     |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Circle CI   |  CIRCLE_JOB                       | CIRCLE_BUILD_NUM      |   circleci    |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Gitlab CI   |  CI_JOB_NAME                      | CI_PIPELINE_ID        |   gitlabci    |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Travis CI   |  TRAVIS_BUILD_ID                  | TRAVIS_BUILD_NUMBER   |   travisci    |
++--------------+-----------------------------------+-----------------------+---------------+
 
 Note that none of these two fields will be added if:
  * the CI context is incomplete

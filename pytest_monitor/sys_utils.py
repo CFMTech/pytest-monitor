@@ -14,19 +14,23 @@ def collect_ci_info():
     if "BUILD_NUMBER" in os.environ:
         if "BRANCH_NAME" in os.environ or "JOB_NAME" in os.environ:
             br = os.environ["BRANCH_NAME"] if "BRANCH_NAME" in os.environ else os.environ["JOB_NAME"]
-            d = dict(pipeline_branch=br, pipeline_build_no=os.environ["BUILD_NUMBER"])
+            d = dict(pipeline_branch=br, pipeline_build_no=os.environ["BUILD_NUMBER"], __ci__='jenkinsci')
     # Test for CircleCI
     if "CIRCLE_JOB" in os.environ and "CIRCLE_BUILD_NUM" in os.environ:
-        d = dict(pipeline_branch=os.environ["CIRCLE_JOB"], pipeline_build_no=os.environ["CIRCLE_BUILD_NUM"])
+        d = dict(pipeline_branch=os.environ["CIRCLE_JOB"], pipeline_build_no=os.environ["CIRCLE_BUILD_NUM"],
+                 __ci__='circleci')
     # Test for TravisCI
     if "TRAVIS_BUILD_NUMBER" in os.environ and "TRAVIS_BUILD_ID" in os.environ:
-        d = dict(pipeline_branch=os.environ["TRAVIS_BUILD_ID"], pipeline_build_no=os.environ["TRAVIS_BUILD_NUMBER"])
+        d = dict(pipeline_branch=os.environ["TRAVIS_BUILD_ID"], pipeline_build_no=os.environ["TRAVIS_BUILD_NUMBER"],
+                 __ci__='travisci')
     # Test for DroneCI
     if "DRONE_REPO_BRANCH" in os.environ and "DRONE_BUILD_NUMBER" in os.environ:
-        d = dict(pipeline_branch=os.environ["DRONE_REPO_BRANCH"], pipeline_build_no=os.environ["DRONE_BUILD_NUMBER"])
+        d = dict(pipeline_branch=os.environ["DRONE_REPO_BRANCH"], pipeline_build_no=os.environ["DRONE_BUILD_NUMBER"],
+                 __ci__='droneci')
     # Test for Gitlab CI
     if "CI_JOB_NAME" in os.environ and "CI_PIPELINE_ID" in os.environ:
-        d = dict(pipeline_branch=os.environ["CI_JOB_NAME"], pipeline_build_no=os.environ["CI_PIPELINE_ID"])
+        d = dict(pipeline_branch=os.environ["CI_JOB_NAME"], pipeline_build_no=os.environ["CI_PIPELINE_ID"],
+                 __ci__='gitlabci')
     return d
 
 
