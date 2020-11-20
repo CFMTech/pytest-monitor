@@ -18,6 +18,13 @@ def test_monitor_no_ci(testdir):
 
 """)
 
+    envs = dict()
+    for k in ["CIRCLE_BUILD_NUM", "CIRCLE_JOB", "DRONE_REPO_BRANCH", "DRONE_BUILD_NUMBER", "BUILD_NUMBER", "JOB_NUMBER",
+              "JOB_NAME", "TRAVIS_BUILD_ID", "TRAVIS_BUILD_NUMBER", "CI_PIPELINE_ID", "CI_JOB_NAME"]:
+        if k in os.environ:
+            envs[k] = os.environ[k]
+            del os.environ[k]
+
     # run pytest with the following cmd args
     result = testdir.runpytest('-v')
 
@@ -36,6 +43,8 @@ def test_monitor_no_ci(testdir):
     desc = cursor.fetchall()
     assert 1 == len(desc)  # current test
     assert desc[0][0] == '{}'
+    for k in envs.keys():
+        os.environ[k] = envs[k]
 
 
 def test_monitor_jenkins_ci(testdir):
