@@ -8,6 +8,28 @@ import subprocess
 import sys
 
 
+def collect_ci_info():
+    d = dict()
+    # Test for jenkins
+    if "BUILD_NUMBER" in os.environ:
+        if "BRANCH_NAME" in os.environ or "JOB_NAME" in os.environ:
+            br = os.environ["BRANCH_NAME"] if "BRANCH_NAME" in os.environ else os.environ["JOB_NAME"]
+            d = dict(pipeline_branch=br, pipeline_build_no=os.environ["BUILD_NUMBER"])
+    # Test for CircleCI
+    if "CIRCLE_JOB" in os.environ and "CIRCLE_BUILD_NUM" in os.environ:
+        d = dict(pipeline_branch=os.environ["CIRCLE_JOB"], pipeline_build_no=os.environ["CIRCLE_BUILD_NUM"])
+    # Test for TravisCI
+    if "TRAVIS_BUILD_NUMBER" in os.environ and "TRAVIS_BUILD_ID" in os.environ:
+        d = dict(pipeline_branch=os.environ["TRAVIS_BUILD_ID"], pipeline_build_no=os.environ["TRAVIS_BUILD_NUMBER"])
+    # Test for DroneCI
+    if "DRONE_REPO_BRANCH" in os.environ and "DRONE_BUILD_NUMBER" in os.environ:
+        d = dict(pipeline_branch=os.environ["DRONE_REPO_BRANCH"], pipeline_build_no=os.environ["DRONE_BUILD_NUMBER"])
+    # Test for Gitlab CI
+    if "CI_JOB_NAME" in os.environ and "CI_PIPELINE_ID" in os.environ:
+        d = dict(pipeline_branch=os.environ["CI_JOB_NAME"], pipeline_build_no=os.environ["CI_PIPELINE_ID"])
+    return d
+
+
 def determine_scm_revision():
     for cmd in [r'git rev-parse HEAD', r'p4 changes -m1 \#have']:
         p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
