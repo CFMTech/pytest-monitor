@@ -27,7 +27,7 @@ shared: &shared
                 conda init bash
                 conda activate ci
                 mkdir test-results
-                pytest --junit-xml=test-results/junit.xml
+                pytest --junit-xml=test-results/junit.xml -s
         - store_test_results:
             path: test-results
         - store_artifacts:

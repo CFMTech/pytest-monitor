@@ -118,12 +118,12 @@ def pytest_runtest_call(item):
     setattr(item, 'monitor_component', getattr(item.module, 'pytest_monitor_component', ''))
 
 
+@pytest.hookimpl
 def pytest_pyfunc_call(pyfuncitem):
     """
     Core sniffer logic. We encapsulate the test function in a sniffer function to collect
     memory results.
     """
-
     def wrapped_function():
         try:
             funcargs = pyfuncitem.funcargs
@@ -135,10 +135,12 @@ def pytest_pyfunc_call(pyfuncitem):
             return e
 
     def prof():
-        m = memory_profiler.memory_usage((wrapped_function, ()), max_usage=True, retval=True)
+        m = memory_profiler.memory_usage((wrapped_function, ()),
+                                         max_iterations=1, max_usage=True, retval=True)
         if isinstance(m[1], BaseException):  # Do we have any outcome?
             raise m[1]
-        setattr(pyfuncitem, 'mem_usage', m[0])
+        memuse = m[0][0] if type(m[0]) is list else m[0]
+        setattr(pyfuncitem, 'mem_usage', memuse)
         setattr(pyfuncitem, 'monitor_results', True)
     prof()
     return True
