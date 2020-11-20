@@ -80,6 +80,14 @@ def test_monitor_jenkins_ci(testdir):
         pymon_path.unlink()
 
     run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "jenkinsci"}'
+    
+    envs = dict()
+    for k in ["CIRCLE_BUILD_NUM", "CIRCLE_JOB", "DRONE_REPO_BRANCH", "DRONE_BUILD_NUMBER", "BUILD_NUMBER", "JOB_NUMBER",
+              "JOB_NAME", "TRAVIS_BUILD_ID", "TRAVIS_BUILD_NUMBER", "CI_PIPELINE_ID", "CI_JOB_NAME"]:
+        if k in os.environ:
+            envs[k] = os.environ[k]
+            del os.environ[k]
+            
     for env, exp in [(dict(BUILD_NUMBER="123"), '{}'),
                      (dict(BUILD_NUMBER="123", JOB_NAME="test"), run_description),
                      (dict(BUILD_NUMBER="123", BRANCH_NAME="test"), run_description),
@@ -138,6 +146,13 @@ def test_monitor_gitlab_ci(testdir):
         pymon_path.unlink()
 
     run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "gitlabci"}'
+    envs = dict()
+    for k in ["CIRCLE_BUILD_NUM", "CIRCLE_JOB", "DRONE_REPO_BRANCH", "DRONE_BUILD_NUMBER", "BUILD_NUMBER", "JOB_NUMBER",
+              "JOB_NAME", "TRAVIS_BUILD_ID", "TRAVIS_BUILD_NUMBER", "CI_PIPELINE_ID", "CI_JOB_NAME"]:
+        if k in os.environ:
+            envs[k] = os.environ[k]
+            del os.environ[k]
+
     for env, exp in [(dict(CI_PIPELINE_ID="123"), '{}'),
                      (dict(CI_PIPELINE_ID="123", CI_JOB_NAME="test"), run_description),
                      (dict(CI_JOB_NAME="123"), '{}')]:
@@ -191,6 +206,13 @@ def test_monitor_travis_ci(testdir):
         pymon_path.unlink()
 
     run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "travisci"}'
+    envs = dict()
+    for k in ["CIRCLE_BUILD_NUM", "CIRCLE_JOB", "DRONE_REPO_BRANCH", "DRONE_BUILD_NUMBER", "BUILD_NUMBER", "JOB_NUMBER",
+              "JOB_NAME", "TRAVIS_BUILD_ID", "TRAVIS_BUILD_NUMBER", "CI_PIPELINE_ID", "CI_JOB_NAME"]:
+        if k in os.environ:
+            envs[k] = os.environ[k]
+            del os.environ[k]
+
     for env, exp in [(dict(TRAVIS_BUILD_NUMBER="123"), '{}'),
                      (dict(TRAVIS_BUILD_NUMBER="123", TRAVIS_BUILD_ID="test"), run_description),
                      (dict(TRAVIS_BUILD_ID="test-123"), '{}')]:
@@ -244,6 +266,13 @@ def test_monitor_circle_ci(testdir):
         pymon_path.unlink()
 
     run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "circleci"}'
+    envs = dict()
+    for k in ["CIRCLE_BUILD_NUM", "CIRCLE_JOB", "DRONE_REPO_BRANCH", "DRONE_BUILD_NUMBER", "BUILD_NUMBER", "JOB_NUMBER",
+              "JOB_NAME", "TRAVIS_BUILD_ID", "TRAVIS_BUILD_NUMBER", "CI_PIPELINE_ID", "CI_JOB_NAME"]:
+        if k in os.environ:
+            envs[k] = os.environ[k]
+            del os.environ[k]
+
     for env, exp in [(dict(CIRCLE_BUILD_NUM="123"), '{}'),
                      (dict(CIRCLE_BUILD_NUM="123", CIRCLE_JOB="test"), run_description),
                      (dict(CIRCLE_JOB="test"), '{}')]:
@@ -297,6 +326,13 @@ def test_monitor_drone_ci(testdir):
         pymon_path.unlink()
 
     run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "droneci"}'
+    envs = dict()
+    for k in ["CIRCLE_BUILD_NUM", "CIRCLE_JOB", "DRONE_REPO_BRANCH", "DRONE_BUILD_NUMBER", "BUILD_NUMBER", "JOB_NUMBER",
+              "JOB_NAME", "TRAVIS_BUILD_ID", "TRAVIS_BUILD_NUMBER", "CI_PIPELINE_ID", "CI_JOB_NAME"]:
+        if k in os.environ:
+            envs[k] = os.environ[k]
+            del os.environ[k]
+
     for env, exp in [(dict(DRONE_BUILD_NUMBER="123"), '{}'),
                      (dict(DRONE_BUILD_NUMBER="123", DRONE_REPO_BRANCH="test"), run_description),
                      (dict(DRONE_REPO_BRANCH="test"), "{}")]:
