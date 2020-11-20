@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* :release:`1.5.0 <2020-11-20>`
+* :feature:`25` Automatically gather CI build information (supported CI are Drone CI, Gitlab CI, Jenkins CI, Travis CI, Circle CI)
+* :bug:`#23 major` psutil min requirement is now 5.1.0
+* :bug:`#28 major` Fix a bug that cause output to be printed multiple times
+
 * :release:`1.4.0 <2020-06-04>`
 * :feature:`21` Using json format to populate the RUN_DESCRIPTION field (through --description and --tag fields)
 
