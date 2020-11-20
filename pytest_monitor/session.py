@@ -10,7 +10,7 @@ import requests
 import warnings
 
 from pytest_monitor.handler import DBHandler
-from pytest_monitor.sys_utils import ExecutionContext, determine_scm_revision
+from pytest_monitor.sys_utils import ExecutionContext, determine_scm_revision, collect_ci_info
 
 
 class PyTestMonitorSession(object):
@@ -63,7 +63,7 @@ class PyTestMonitorSession(object):
         h.update(description.encode())
         self.__session = h.hexdigest()
         # From description + tags to JSON format
-        d = dict()
+        d = collect_ci_info()
         if description:
             d['description'] = description
         for tag in tags:

@@ -79,12 +79,16 @@ Disable monitoring
 If you need for some reason to disable the monitoring, pass the *\-\-no-trace* option.
 
 
-Adding a description to a run
------------------------------
+Describing a run
+----------------
 
 Sometimes, you might want to compare identical state of your code. In such cases, relying only on the scm
-references and the run date of the session. For that, `pytest-monitor` can assist you by tagging
+references and the run date of the session is not sufficient. For that, `pytest-monitor` can assist you by tagging
 your session using description and tags.
+
+
+Description and tags
+~~~~~~~~~~~~~~~~~~~~
 The description should be used to provide a brief summary of your run while tags can be used to
 set special information you want to focus during your analysis. 
 Setting a description is as simple as this:
@@ -125,3 +129,39 @@ This will result in a session with the following description:
         "pandas": "1.0.1",
         "numpy": "1.17"
     }
+
+Describing a CI build
+~~~~~~~~~~~~~~~~~~~~~
+For convenience pytest-monitor automatically extends the session's description with some information
+extracted from the CI build. For that purpose, pytest-monitor reads the environment
+at the start of the test session in search for:
+ * **pipeline_branch**, which can either represent a CI pipeline name (preferentially) or the source code branch name.
+ * **pipeline_build_no**, which is the pipeline build number (if available) or the pipeline ID if any.
+ * **__ci__** which provides you the ci system used.
+
+Currently, pytest-monitor supports the following CI:
+ * Gitlab CI
+ * Travis CI
+ * Jenkins
+ * Drone CI
+ * Circle CI
+
+The following table explains how both fields are mapped:
+
++--------------+-----------------------------------+-----------------------+---------------+
+|       CI     |     pipeline_branch               | pipeline_build_no     |  __ci__       |
++==============+===================================+=======================+===============+
+|  Jenkins CI  |  BRANCH_NAME if set else JOB_NAME | BUILD_NUMBER          |   jenkinsci   |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Drone CI    |  DRONE_REPO_BRANCH                | DRONE_BUILD_NUMBER    |   droneci     |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Circle CI   |  CIRCLE_JOB                       | CIRCLE_BUILD_NUM      |   circleci    |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Gitlab CI   |  CI_JOB_NAME                      | CI_PIPELINE_ID        |   gitlabci    |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Travis CI   |  TRAVIS_BUILD_ID                  | TRAVIS_BUILD_NUMBER   |   travisci    |
++--------------+-----------------------------------+-----------------------+---------------+
+
+Note that none of these two fields will be added if:
+ * the CI context is incomplete
+ * the CI context cannot be computed.

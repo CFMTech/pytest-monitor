@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.skip(reason='Some special test to skip')
-def test_that():
+def test_is_skipped():
     assert True
 
 
