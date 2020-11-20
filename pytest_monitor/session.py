@@ -63,7 +63,7 @@ class PyTestMonitorSession(object):
         h.update(description.encode())
         self.__session = h.hexdigest()
         # From description + tags to JSON format
-        d=dict()
+        d = dict()
         if description:
             d['description'] = description
         for tag in tags:
@@ -72,7 +72,7 @@ class PyTestMonitorSession(object):
                 d[_tag_info[0]] = _tag_info[1]
             else:
                 for sub_tag in tag:
-                    _tag_info = subtag.split('=', 1)
+                    _tag_info = sub_tag.split('=', 1)
                     d[_tag_info[0]] = _tag_info[1]
         description = json.dumps(d)
         # Now get memory usage base and create the database
@@ -111,7 +111,8 @@ class PyTestMonitorSession(object):
         def dummy():
             return True
 
-        self.__mem_usage_base = memory_profiler.memory_usage((dummy,), max_usage=True)
+        memuse = memory_profiler.memory_usage((dummy,), max_iterations=1, max_usage=True)
+        self.__mem_usage_base = memuse[0] if type(memuse) is list else memuse
 
     def add_test_info(self, item, item_path, item_variant, item_loc, kind, component,
                       item_start_time, total_time, user_time, kernel_time, mem_usage):

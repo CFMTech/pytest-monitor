@@ -270,12 +270,8 @@ def test_monitor_basic_output(testdir):
         result = testdir.runpytest('--no-db', '-s', '-vv')
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_it PASSED*'])
-    result.stdout.fnmatch_lines(['Hello World'])
-    assert 'Hello World' != result.stdout.get_lines_after('Hello World')[0]
-    print(result.stdout)
-    print('------')
-    print(result.stdout.get_lines_after('Hello World'))
+    result.stdout.fnmatch_lines(['*::test_it Hello World*'])
+    assert "Hello World" != result.stdout.get_lines_after('*Hello World')[0]
 
     # make sure that that we get a '0' exit code for the testsuite
-    result.assert_outcomes(passed=2)
+    result.assert_outcomes(passed=1)
