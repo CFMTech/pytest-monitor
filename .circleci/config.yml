@@ -69,6 +69,14 @@ workflows:
                   filters:
                       tags:
                           only: /.*/
+            - pytestmonitor-py36-pytest60:
+                  filters:
+                      tags:
+                          only: /.*/
+            - pytestmonitor-py36-pytest61:
+                  filters:
+                      tags:
+                          only: /.*/
             - pytestmonitor-py37-pytest44:
                 filters:
                     tags:
@@ -101,6 +109,14 @@ workflows:
                   filters:
                       tags:
                           only: /.*/
+            - pytestmonitor-py37-pytest60:
+                  filters:
+                      tags:
+                          only: /.*/
+            - pytestmonitor-py37-pytest61:
+                  filters:
+                      tags:
+                          only: /.*/
             - pytestmonitor-py38-pytest46:
                 filters:
                     tags:
@@ -114,6 +130,14 @@ workflows:
                   tags:
                       only: /.*/
             - pytestmonitor-py38-pytest54:
+                  filters:
+                      tags:
+                          only: /.*/
+            - pytestmonitor-py38-pytest60:
+                  filters:
+                      tags:
+                          only: /.*/
+            - pytestmonitor-py38-pytest61:
                   filters:
                       tags:
                           only: /.*/
