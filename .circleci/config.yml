@@ -14,7 +14,7 @@ shared: &shared
             command: |
                 conda create -n ci ${CI_PYTHON} -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
                 conda install -n ci ${CI_PYTEST} -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
-                conda install -n ci wheel psutil memory_profiler -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
+                conda install -n ci --file requirements.txt -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
                 conda init bash
         - run:
             name: "Prepare Project"
@@ -127,6 +127,8 @@ workflows:
                     - pytestmonitor-py36-pytest52
                     - pytestmonitor-py36-pytest53
                     - pytestmonitor-py36-pytest54
+                    - pytestmonitor-py36-pytest60
+                    - pytestmonitor-py36-pytest61
                     - pytestmonitor-py37-pytest44
                     - pytestmonitor-py37-pytest45
                     - pytestmonitor-py37-pytest46
@@ -135,10 +137,14 @@ workflows:
                     - pytestmonitor-py37-pytest52
                     - pytestmonitor-py37-pytest53
                     - pytestmonitor-py37-pytest54
+                    - pytestmonitor-py37-pytest60
+                    - pytestmonitor-py37-pytest61
                     - pytestmonitor-py38-pytest46
                     - pytestmonitor-py38-pytest52
                     - pytestmonitor-py38-pytest53
                     - pytestmonitor-py38-pytest54
+                    - pytestmonitor-py38-pytest60
+                    - pytestmonitor-py38-pytest61
                 filters:
                     tags:
                         only: /^[a-zA-Z].*/
@@ -197,6 +203,16 @@ jobs:
             CI_PYTHON: 'python=3.6'
             CI_PYTEST: 'pytest=5.4'
         <<: *shared
+    pytestmonitor-py36-pytest60:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=6.0'
+        <<: *shared
+    pytestmonitor-py36-pytest61:
+        environment:
+            CI_PYTHON: 'python=3.6'
+            CI_PYTEST: 'pytest=6.1'
+        <<: *shared
     pytestmonitor-py37-pytest44:
         environment:
             CI_PYTHON: 'python=3.7'
@@ -237,6 +253,16 @@ jobs:
             CI_PYTHON: 'python=3.7'
             CI_PYTEST: 'pytest=5.4'
         <<: *shared
+    pytestmonitor-py37-pytest60:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=6.0'
+        <<: *shared
+    pytestmonitor-py37-pytest61:
+        environment:
+            CI_PYTHON: 'python=3.7'
+            CI_PYTEST: 'pytest=6.1'
+        <<: *shared
     pytestmonitor-py38-pytest46:
         environment:
             CI_PYTHON: 'python=3.8'
@@ -256,6 +282,16 @@ jobs:
         environment:
             CI_PYTHON: 'python=3.8'
             CI_PYTEST: 'pytest=5.4'
+        <<: *shared
+    pytestmonitor-py38-pytest60:
+        environment:
+            CI_PYTHON: 'python=3.8'
+            CI_PYTEST: 'pytest=6.0'
+        <<: *shared
+    pytestmonitor-py38-pytest61:
+        environment:
+            CI_PYTHON: 'python=3.8'
+            CI_PYTEST: 'pytest=6.1'
         <<: *shared
     nightly_build:
         environment:
