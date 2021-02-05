@@ -40,7 +40,7 @@ setup(
     long_description=read('README.rst'),
     packages=find_packages('.', exclude=('tests', 'example', 'docs')),
     python_requires='>=3.5',
-    install_requires=['pytest', 'requests', 'psutil', 'memory_profiler', 'wheel'],
+    install_requires=['pytest', 'requests', 'psutil>=5.1.0', 'memory_profiler>=0.58', 'wheel'],
     options={"bdist_wheel": {"universal": False}},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
