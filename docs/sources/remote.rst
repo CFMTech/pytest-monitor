@@ -7,7 +7,7 @@ To do so, instruct pytest with the remote server address to use:
 
 .. code-block:: shell
 
-   bash $> pytest --remote myremote.server.net:port 
+   bash $> pytest --remote-server myremote.server.net:port 
 
 This way, *pytest-monitor* will automatically send and query the remote server as soon as it gets
 a need.  Note that *pytest-monitor* will revert to a normal behaviour if:
