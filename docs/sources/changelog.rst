@@ -3,7 +3,8 @@ Changelog
 =========
 
 * :release:`1.5.1 <2021-02-05>`
-* :bug:`#31` Rename option --remote as it seems to conflict with some plugins.  
+* :bug:`#31` Rename option --remote into --remote-server as it seems to conflict with some plugins.  
+* :bug:`#23` Fix requirements minimum version.
 
 * :release:`1.5.0 <2020-11-20>`
 * :feature:`25` Automatically gather CI build information (supported CI are Drone CI, Gitlab CI, Jenkins CI, Travis CI, Circle CI)
