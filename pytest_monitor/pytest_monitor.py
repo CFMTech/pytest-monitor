@@ -31,7 +31,7 @@ def pytest_addoption(parser):
                     help='Set this option to distinguish parametrized tests given their values.'
                          ' This requires the parameters to be stringifiable.')
     group.addoption('--no-monitor', action='store_true', dest='mtr_none', help='Disable all traces')
-    group.addoption('--remote', action='store', dest='mtr_remote',
+    group.addoption('--remote-server', action='store', dest='mtr_remote',
                     help='Remote server to send the results to. Format is <ADRESS>:<PORT>')
     group.addoption('--db', action='store', dest='mtr_db_out', default='.pymon',
                     help='Use the given sqlite database for storing results.')
