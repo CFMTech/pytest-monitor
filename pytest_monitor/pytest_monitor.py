@@ -36,7 +36,7 @@ def pytest_addoption(parser):
     group.addoption('--db', action='store', dest='mtr_db_out', default='.pymon',
                     help='Use the given sqlite database for storing results.')
     group.addoption('--no-db', action='store_true', dest='mtr_no_db', help='Do not store results in local db.')
-    group.addoption('--force-component', action='store', dest='mtr_force_component', 
+    group.addoption('--force-component', action='store', dest='mtr_force_component',
                     help='Force the component to be set at the given value for the all tests run'
                          ' in this session.')
     group.addoption('--component-prefix', action='store', dest='mtr_component_prefix',
@@ -70,10 +70,10 @@ def pytest_runtest_setup(item):
     mark_to_del = []
     for set_marker in item_markers.keys():
         if set_marker not in PYTEST_MONITOR_VALID_MARKERS:
-            warnings.warn(f"Nothing known about marker {set_marker}. Marker will be dropped.")
+            warnings.warn("Nothing known about marker {}. Marker will be dropped.".format(set_marker))
             mark_to_del.append(set_marker)
         if set_marker in PYTEST_MONITOR_DEPRECATED_MARKERS:
-            warnings.warn(f'Marker {set_marker} is deprecated. Consider upgrading your tests')
+            warnings.warn('Marker {} is deprecated. Consider upgrading your tests'.format(set_marker))
 
     for marker in mark_to_del:
         del item_markers[marker]
@@ -148,7 +148,7 @@ def pytest_pyfunc_call(pyfuncitem):
 
 def pytest_make_parametrize_id(config, val, argname):
     if config.option.mtr_want_explicit_ids:
-        return f'{argname}={val}'
+        return '{}={}'.format(argname, val)
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -162,7 +162,7 @@ def pytest_sessionstart(session):
     if session.config.option.mtr_no_db and not session.config.option.mtr_remote and not session.config.option.mtr_none:
         warnings.warn('pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring.')
         session.config.option.mtr_none = True
-    component = session.config.option.mtr_force_component or session.config.option.mtr_component_prefix 
+    component = session.config.option.mtr_force_component or session.config.option.mtr_component_prefix
     if session.config.option.mtr_component_prefix:
         component += '.{user_component}'
     if not component:

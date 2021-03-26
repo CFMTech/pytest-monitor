@@ -44,7 +44,7 @@ class PyTestMonitorSession(object):
             row = self.__db.query('SELECT ENV_H FROM EXECUTION_CONTEXTS WHERE ENV_H= ?', (env.hash(),))
             db = row[0] if row else None
         if self.__remote:
-            r = requests.get(f'{self.__remote}/contexts/{env.hash()}')
+            r = requests.get('{}/contexts/{}'.format(self.__remote, env.hash()))
             remote = None
             if r.status_code == HTTPStatus.OK:
                 remote = json.loads(r.text)
@@ -81,14 +81,14 @@ class PyTestMonitorSession(object):
         if self.__db:
             self.__db.insert_session(self.__session, run_date, scm, description)
         if self.__remote:
-            r = requests.post(f'{self.__remote}/sessions/',
+            r = requests.post('{}/sessions/'.format(self.__remote),
                               json=dict(session_h=self.__session,
                                         run_date=run_date,
                                         scm_ref=scm,
                                         description=description))
             if r.status_code != HTTPStatus.CREATED:
                 self.__remote = ''
-                msg = f"Cannot insert session in remote monitor server ({r.status_code})! Deactivating...')"
+                msg = "Cannot insert session in remote monitor server ({})! Deactivating...')".format(r.status_code)
                 warnings.warn(msg)
 
     def set_environment_info(self, env):
@@ -99,9 +99,9 @@ class PyTestMonitorSession(object):
             db_id = self.__db.query('select ENV_H from EXECUTION_CONTEXTS where ENV_H = ?', (env.hash(),))[0]
         if self.__remote and remote_id is None:
             # We must postpone that to be run at the end of the pytest session.
-            r = requests.post(f'{self.__remote}/contexts/', json=env.to_dict())
+            r = requests.post('{}/contexts/'.format(self.__remote), json=env.to_dict())
             if r.status_code != HTTPStatus.CREATED:
-                warnings.warn(f'Cannot insert execution context in remote server (rc={r.status_code}! Deactivating...')
+                warnings.warn('Cannot insert execution context in remote server (rc={}! Deactivating...'.format(r.status_code))
                 self.__remote = ''
             else:
                 remote_id = json.loads(r.text)['h']
@@ -130,7 +130,7 @@ class PyTestMonitorSession(object):
                                     item_path, item_variant, item_loc, kind, final_component, total_time, user_time,
                                     kernel_time, cpu_usage, mem_usage)
         if self.__remote and self.remote_env_id is not None:
-            r = requests.post(f'{self.__remote}/metrics/',
+            r = requests.post('{}/metrics/'.format(self.__remote),
                               json=dict(session_h=self.__session,
                                         context_h=self.remote_env_id,
                                         item_start_time=item_start_time,
@@ -147,5 +147,5 @@ class PyTestMonitorSession(object):
                                         mem_usage=mem_usage))
             if r.status_code != HTTPStatus.CREATED:
                 self.__remote = ''
-                msg = f"Cannot insert values in remote monitor server ({r.status_code})! Deactivating...')"
+                msg = "Cannot insert values in remote monitor server ({})! Deactivating...')".format(r.status_code)
                 warnings.warn(msg)
