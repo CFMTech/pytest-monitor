@@ -14,26 +14,26 @@ class DBHandler:
 
     def insert_session(self, h, run_date, scm_id, description):
         with self.__cnx:
-            self.__cnx.execute(f'insert into TEST_SESSIONS(SESSION_H, RUN_DATE, SCM_ID, RUN_DESCRIPTION)'
-                               f' values (?,?,?,?)',
+            self.__cnx.execute('insert into TEST_SESSIONS(SESSION_H, RUN_DATE, SCM_ID, RUN_DESCRIPTION)'
+                               ' values (?,?,?,?)',
                                (h, run_date, scm_id, description))
 
     def insert_metric(self, session_id, env_id, item_start_date, item, item_path, item_variant,
                       item_loc, kind, component, total_time, user_time, kernel_time, cpu_usage, mem_usage):
         with self.__cnx:
-            self.__cnx.execute(f'insert into TEST_METRICS(SESSION_H,ENV_H,ITEM_START_TIME,ITEM,'
-                               f'ITEM_PATH,ITEM_VARIANT,ITEM_FS_LOC,KIND,COMPONENT,TOTAL_TIME,'
-                               f'USER_TIME,KERNEL_TIME,CPU_USAGE,MEM_USAGE) '
-                               f'values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            self.__cnx.execute('insert into TEST_METRICS(SESSION_H,ENV_H,ITEM_START_TIME,ITEM,'
+                               'ITEM_PATH,ITEM_VARIANT,ITEM_FS_LOC,KIND,COMPONENT,TOTAL_TIME,'
+                               'USER_TIME,KERNEL_TIME,CPU_USAGE,MEM_USAGE) '
+                               'values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                                (session_id, env_id, item_start_date, item, item_path,
                                 item_variant, item_loc, kind, component, total_time, user_time,
                                 kernel_time, cpu_usage, mem_usage))
 
     def insert_execution_context(self, exc_context):
         with self.__cnx:
-            self.__cnx.execute(f'insert into EXECUTION_CONTEXTS(CPU_COUNT,CPU_FREQUENCY_MHZ,CPU_TYPE,CPU_VENDOR,'
-                               f'RAM_TOTAL_MB,MACHINE_NODE,MACHINE_TYPE,MACHINE_ARCH,SYSTEM_INFO,'
-                               f'PYTHON_INFO,ENV_H) values (?,?,?,?,?,?,?,?,?,?,?)',
+            self.__cnx.execute('insert into EXECUTION_CONTEXTS(CPU_COUNT,CPU_FREQUENCY_MHZ,CPU_TYPE,CPU_VENDOR,'
+                               'RAM_TOTAL_MB,MACHINE_NODE,MACHINE_TYPE,MACHINE_ARCH,SYSTEM_INFO,'
+                               'PYTHON_INFO,ENV_H) values (?,?,?,?,?,?,?,?,?,?,?)',
                                (exc_context.cpu_count, exc_context.cpu_frequency, exc_context.cpu_type,
                                 exc_context.cpu_vendor, exc_context.ram_total, exc_context.fqdn, exc_context.machine,
                                 exc_context.architecture, exc_context.system_info, exc_context.python_info,
@@ -45,7 +45,7 @@ class DBHandler:
 CREATE TABLE IF NOT EXISTS TEST_SESSIONS(
     SESSION_H varchar(64) primary key not null unique, -- Session identifier
     RUN_DATE varchar(64), -- Date of test run
-    SCM_ID varchar(128), -- SCM change id 
+    SCM_ID varchar(128), -- SCM change id
     RUN_DESCRIPTION varchar(1024)
 );''')
         cursor.execute('''

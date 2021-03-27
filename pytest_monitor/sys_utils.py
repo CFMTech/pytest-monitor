@@ -68,7 +68,7 @@ class ExecutionContext:
         self.__fqdn = socket.getfqdn()
         self.__machine = platform.machine()
         self.__arch = platform.architecture()[0]
-        self.__system = f'{platform.system()} - {platform.release()}'
+        self.__system = '{} - {}'.format(platform.system(), platform.release())
         self.__py_ver = sys.version
 
     def to_dict(self):
