@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS TEST_SESSIONS(
     SESSION_H varchar(64) primary key not null unique, -- Session identifier
     RUN_DATE varchar(64), -- Date of test run
     SCM_ID varchar(128), -- SCM change id
-    RUN_DESCRIPTION varchar(1024)
+    RUN_DESCRIPTION json
 );''')
         cursor.execute('''
 CREATE TABLE IF NOT EXISTS TEST_METRICS (

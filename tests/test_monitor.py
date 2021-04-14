@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import pathlib
 import pytest
 import sqlite3
@@ -9,8 +10,8 @@ def test_monitor_basic_test(testdir):
     # create a temporary pytest test module
     testdir.makepyfile("""
     import time
-    
-    
+
+
     def test_ok():
         time.sleep(0.5)
         x = ['a' * i for i in range(100)]
@@ -19,7 +20,7 @@ def test_monitor_basic_test(testdir):
 """)
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest('-vv', '--tag', 'version=12.3.5')
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(['*::test_ok PASSED*'])
@@ -27,13 +28,56 @@ def test_monitor_basic_test(testdir):
     pymon_path = pathlib.Path(str(testdir)) / '.pymon'
     assert pymon_path.exists()
 
-    # make sure that that we get a '0' exit code for the testsuite
+    # make sure that that we get a '0' exit code for the test suite
     result.assert_outcomes(passed=1)
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute('SELECT ITEM FROM TEST_METRICS;')
     assert 1 == len(cursor.fetchall())  # current test
+    cursor = db.cursor()
+    tags = json.loads(cursor.execute('SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;').fetchone()[0])
+    assert 'description' not in tags
+    assert 'version' in tags
+    assert tags['version'] == "12.3.5"
+
+
+def test_monitor_basic_test_description(testdir):
+    """Make sure that pytest-monitor does the job without impacting user tests."""
+    # create a temporary pytest test module
+    testdir.makepyfile("""
+    import time
+
+
+    def test_ok():
+        time.sleep(0.5)
+        x = ['a' * i for i in range(100)]
+        assert len(x) == 100
+
+""")
+
+    # run pytest with the following cmd args
+    result = testdir.runpytest('-vv', '--description', '"Test"', '--tag', 'version=12.3.5')
+
+    # fnmatch_lines does an assertion internally
+    result.stdout.fnmatch_lines(['*::test_ok PASSED*'])
+
+    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    assert pymon_path.exists()
+
+    # make sure that that we get a '0' exit code for the test suite
+    result.assert_outcomes(passed=1)
+
+    db = sqlite3.connect(str(pymon_path))
+    cursor = db.cursor()
+    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    assert 1 == len(cursor.fetchall())  # current test
+    cursor = db.cursor()
+    tags = json.loads(cursor.execute('SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;').fetchone()[0])
+    assert 'description' in tags
+    assert tags['description'] == '"Test"'
+    assert 'version' in tags
+    assert tags['version'] == "12.3.5"
 
 
 def test_monitor_pytest_skip_marker(testdir):
