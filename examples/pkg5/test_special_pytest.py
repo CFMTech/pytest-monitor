@@ -12,4 +12,3 @@ def test_that_one_is_skipped_too():
 
 def test_import_or_skip():
     pytest.importorskip('this_module_does_not_exists')
-

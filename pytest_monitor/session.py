@@ -14,10 +14,11 @@ from pytest_monitor.sys_utils import ExecutionContext, determine_scm_revision, c
 
 
 class PyTestMonitorSession(object):
-    def __init__(self, db=None, remote=None, component='', scope=None):
+    def __init__(self, db=None, remote=None, component='', scope=None, tracing=True):
         self.__db = None
         if db:
             self.__db = DBHandler(db)
+        self.__monitor_enabled = tracing
         self.__remote = remote
         self.__component = component
         self.__session = ''
@@ -25,6 +26,10 @@ class PyTestMonitorSession(object):
         self.__eid = (None, None)
         self.__mem_usage_base = None
         self.__process = psutil.Process(os.getpid())
+
+    @property
+    def monitoring_enabled(self):
+        return self.__monitor_enabled
 
     @property
     def remote_env_id(self):
