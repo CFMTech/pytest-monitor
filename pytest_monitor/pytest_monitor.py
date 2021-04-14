@@ -20,6 +20,8 @@ PYTEST_MONITOR_VALID_MARKERS = {'monitor_skip_test': (False, 'monitor_skip_test'
 PYTEST_MONITOR_DEPRECATED_MARKERS = {}
 PYTEST_MONITOR_ITEM_LOC_MEMBER = '_location' if tuple(pytest.__version__.split('.')) < ('5', '3') else 'location'
 
+PYTEST_MONITORING_ENABLED = True
+
 
 def pytest_addoption(parser):
     group = parser.getgroup('monitor')
@@ -66,6 +68,8 @@ def pytest_runtest_setup(item):
     Setting marker attribute to the discovered item is done after the above described verification.
     :param item: Test item
     """
+    if not PYTEST_MONITORING_ENABLED:
+        return
     item_markers = {mark.name: mark for mark in item.iter_markers() if mark and mark.name.startswith('monitor_')}
     mark_to_del = []
     for set_marker in item_markers.keys():
@@ -114,8 +118,13 @@ def pytest_runtest_makereport(item, call):
 
 
 def pytest_runtest_call(item):
+    if not PYTEST_MONITORING_ENABLED:
+        return
     setattr(item, 'monitor_results', False)
-    setattr(item, 'monitor_component', getattr(item.module, 'pytest_monitor_component', ''))
+    if hasattr(item, 'module'):
+        setattr(item, 'monitor_component', getattr(item.module, 'pytest_monitor_component', ''))
+    else:
+        setattr(item, 'monitor_skip_test', True)
 
 
 @pytest.hookimpl
@@ -142,7 +151,10 @@ def pytest_pyfunc_call(pyfuncitem):
         memuse = m[0][0] if type(m[0]) is list else m[0]
         setattr(pyfuncitem, 'mem_usage', memuse)
         setattr(pyfuncitem, 'monitor_results', True)
-    prof()
+    if not PYTEST_MONITORING_ENABLED:
+        wrapped_function()
+    else:
+        prof()
     return True
 
 
@@ -172,6 +184,8 @@ def pytest_sessionstart(session):
     session.pytest_monitor = PyTestMonitorSession(db=db, remote=remote,
                                                   component=component,
                                                   scope=session.config.option.mtr_scope)
+    global PYTEST_MONITORING_ENABLED
+    PYTEST_MONITORING_ENABLED = not session.config.option.mtr_none
     session.pytest_monitor.compute_info(session.config.option.mtr_description,
                                         session.config.option.mtr_tags)
     yield
@@ -179,38 +193,44 @@ def pytest_sessionstart(session):
 
 @pytest.fixture(autouse=True, scope='module')
 def prf_module_tracer(request):
-    t_a = time.time()
-    ptimes_a = request.session.pytest_monitor.process.cpu_times()
-    yield
-    ptimes_b = request.session.pytest_monitor.process.cpu_times()
-    t_z = time.time()
-    rss = request.session.pytest_monitor.process.memory_info().rss / 1024 ** 2
-    component = getattr(request.module, 'pytest_monitor_component', '')
-    item = request.node.name[:-3]
-    pypath = request.module.__name__[:-len(item)-1]
-    request.session.pytest_monitor.add_test_info(item, pypath, '',
-                                                 request.node._nodeid,
-                                                 'module',
-                                                 component, t_a, t_z - t_a,
-                                                 ptimes_b.user - ptimes_a.user,
-                                                 ptimes_b.system - ptimes_a.system,
-                                                 rss)
+    if not PYTEST_MONITORING_ENABLED:
+        yield
+    else:
+        t_a = time.time()
+        ptimes_a = request.session.pytest_monitor.process.cpu_times()
+        yield
+        ptimes_b = request.session.pytest_monitor.process.cpu_times()
+        t_z = time.time()
+        rss = request.session.pytest_monitor.process.memory_info().rss / 1024 ** 2
+        component = getattr(request.module, 'pytest_monitor_component', '')
+        item = request.node.name[:-3]
+        pypath = request.module.__name__[:-len(item)-1]
+        request.session.pytest_monitor.add_test_info(item, pypath, '',
+                                                     request.node._nodeid,
+                                                     'module',
+                                                     component, t_a, t_z - t_a,
+                                                     ptimes_b.user - ptimes_a.user,
+                                                     ptimes_b.system - ptimes_a.system,
+                                                     rss)
 
 
 @pytest.fixture(autouse=True)
 def prf_tracer(request):
-    ptimes_a = request.session.pytest_monitor.process.cpu_times()
-    yield
-    ptimes_b = request.session.pytest_monitor.process.cpu_times()
-    if not request.node.monitor_skip_test and request.node.monitor_results:
-        item_name = request.node.originalname or request.node.name
-        item_loc = getattr(request.node, PYTEST_MONITOR_ITEM_LOC_MEMBER)[0]
-        request.session.pytest_monitor.add_test_info(item_name, request.module.__name__,
-                                                     request.node.name, item_loc,
-                                                     'function',
-                                                     request.node.monitor_component,
-                                                     request.node.test_effective_start_time,
-                                                     request.node.test_run_duration,
-                                                     ptimes_b.user - ptimes_a.user,
-                                                     ptimes_b.system - ptimes_a.system,
-                                                     request.node.mem_usage)
+    if not PYTEST_MONITORING_ENABLED:
+        yield
+    else:
+        ptimes_a = request.session.pytest_monitor.process.cpu_times()
+        yield
+        ptimes_b = request.session.pytest_monitor.process.cpu_times()
+        if not request.node.monitor_skip_test and request.node.monitor_results:
+            item_name = request.node.originalname or request.node.name
+            item_loc = getattr(request.node, PYTEST_MONITOR_ITEM_LOC_MEMBER)[0]
+            request.session.pytest_monitor.add_test_info(item_name, request.module.__name__,
+                                                         request.node.name, item_loc,
+                                                         'function',
+                                                         request.node.monitor_component,
+                                                         request.node.test_effective_start_time,
+                                                         request.node.test_run_duration,
+                                                         ptimes_b.user - ptimes_a.user,
+                                                         ptimes_b.system - ptimes_a.system,
+                                                         request.node.mem_usage)

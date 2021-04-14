@@ -275,3 +275,37 @@ def test_monitor_basic_output(testdir):
 
     # make sure that that we get a '0' exit code for the testsuite
     result.assert_outcomes(passed=1)
+
+
+def test_monitor_with_doctest(testdir):
+    """Make sure that pytest-monitor does not fail to run doctest."""
+
+    # create a temporary pytest test module
+    testdir.makepyfile('''
+        def run(a, b):
+            """
+            >>> run(3, 30)
+            33
+            """
+            return a + b
+    ''')
+
+    # run pytest with the following cmd args
+    result = testdir.runpytest('--doctest-modules', '-vv')
+
+    # make sure that that we get a '0' exit code for the testsuite
+    result.assert_outcomes(passed=1)
+    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    assert pymon_path.exists()
+
+    db = sqlite3.connect(str(pymon_path))
+    cursor = db.cursor()
+    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    assert not len(cursor.fetchall())
+
+    pymon_path.unlink()
+    result = testdir.runpytest('--doctest-modules', '--no-monitor', '-vv')
+
+    # make sure that that we get a '0' exit code for the testsuite
+    result.assert_outcomes(passed=1)
+    assert not pymon_path.exists()
