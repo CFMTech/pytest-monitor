@@ -2,6 +2,12 @@
 Changelog
 =========
 
+* :release:`1.6.0 <2021-04-16>`
+* :feature:`#0` Support for python 3.5
+* :feature:`#35` Better support for Doctest item.
+* :feature:`#24` Prefer JSON data type for storing session extended information instead of plain text.
+
+
 * :release:`1.5.1 <2021-02-05>`
 * :bug:`#31` Rename option --remote into --remote-server as it seems to conflict with some plugins.  
 * :bug:`#23` Fix requirements minimum version.
