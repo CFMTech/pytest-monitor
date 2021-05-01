@@ -116,6 +116,8 @@ You will need a valid Python 3.5+ interpreter. To get measures, we rely on:
 - *memory_profiler* to collect memory usage
 - and *pytest* (obviously!)
 
+**Note: this plugin doesn't work with unittest**
+
 Contributing
 ------------
 
