@@ -90,7 +90,7 @@ class PyTestMonitorSession(object):
                               json=dict(session_h=self.__session,
                                         run_date=run_date,
                                         scm_ref=scm,
-                                        description=description))
+                                        description=json.loads(description)))
             if r.status_code != HTTPStatus.CREATED:
                 self.__remote = ''
                 msg = "Cannot insert session in remote monitor server ({})! Deactivating...')".format(r.status_code)
