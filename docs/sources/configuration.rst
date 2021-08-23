@@ -165,3 +165,14 @@ The following table explains how both fields are mapped:
 Note that none of these two fields will be added if:
  * the CI context is incomplete
  * the CI context cannot be computed.
+
+Parameters affecting measures
+-----------------------------
+By default, pytest-monitor runs the garbage collector prior to execute the test function.
+This leads to finer memory measurements. In the case where you want to disable this call to the
+garbage collector, you just have to set the option `--no-gc` on the command line.
+
+.. code-block:: shell
+
+    bash $> pytest --no-gc
+
