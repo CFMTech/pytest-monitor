@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :release:`1.6.1 <2021-08-23>`
+* :bug:`#43` Fixes a bug that prevent sending session tags correctly.
+* :bug:`#40` Force garbage collector to run between tests (better result accuracy)
+
 * :release:`1.6.0 <2021-04-16>`
 * :feature:`#0` Support for python 3.5
 * :feature:`#35` Better support for Doctest item.
