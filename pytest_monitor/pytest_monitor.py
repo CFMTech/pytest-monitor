@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import gc
 import memory_profiler
 import pytest
 import time
@@ -44,6 +45,8 @@ def pytest_addoption(parser):
     group.addoption('--component-prefix', action='store', dest='mtr_component_prefix',
                     help='Prefix each found components with the given value (applies to all tests'
                          ' run in this session).')
+    group.addoption('--no-gc', action="store_true", dest="mtr_no_gc", 
+                    help='Disable garbage collection between tests (may leads to non reliable measures)')
     group.addoption('--description', action='store', default='', dest='mtr_description',
                     help='Use this option to provide a small summary about this run.')
     group.addoption('--tag', action='append', dest='mtr_tags', default=[],
@@ -154,6 +157,8 @@ def pytest_pyfunc_call(pyfuncitem):
     if not PYTEST_MONITORING_ENABLED:
         wrapped_function()
     else:
+        if pyfuncitem.session.config.option.mtr_no_gc:
+            gc.collect()
         prof()
     return True
 
