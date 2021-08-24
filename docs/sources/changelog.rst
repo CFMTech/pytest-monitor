@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`1.6.2 <2021-08-24>`
+* :bug:`#40` Fix a bug that cause the garbage collector to be disable by default.
+
 * :release:`1.6.1 <2021-08-23>`
 * :bug:`#43` Fixes a bug that prevent sending session tags correctly.
 * :bug:`#40` Force garbage collector to run between tests (better result accuracy)
