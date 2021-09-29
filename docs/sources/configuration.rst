@@ -76,7 +76,7 @@ which will lead to the following entries:
 Disable monitoring
 ------------------
 
-If you need for some reason to disable the monitoring, pass the *\-\-no-trace* option.
+If you need for some reason to disable the monitoring, pass the *\-\-no-monitor* option.
 
 
 Describing a run
