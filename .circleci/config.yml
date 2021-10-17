@@ -12,9 +12,7 @@ shared: &shared
         - run:
             name: "Setup Environment"
             command: |
-                conda create -n ci ${CI_PYTHON} -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
-                conda install -n ci ${CI_PYTEST} -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
-                conda install -n ci --file requirements.txt -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
+                conda create -n ci ${CI_PYTHON} ${CI_PYTEST} $(cat requirements.txt | tr '\n' ' ') -c https://conda.anaconda.org/conda-forge -y
                 conda init bash
         - run:
             name: "Prepare Project"

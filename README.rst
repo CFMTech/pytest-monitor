@@ -118,6 +118,14 @@ You will need a valid Python 3.5+ interpreter. To get measures, we rely on:
 
 **Note: this plugin doesn't work with unittest**
 
+Storage backends
+----------------
+By default, pytest-monitor stores its result in a local SQLite3 local database, making results accessible.
+If you need a more powerful way to analyze your results, checkout the
+`monitor-server-api`_ which brings both a REST Api for storing and historize your results and an API to query your data.
+An alternative service (using MongoDB) can be used thanks to a contribution from @dremdem: `pytest-monitor-backend`_.
+
+
 Contributing
 ------------
 
@@ -160,3 +168,5 @@ This `pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`
 .. _`tox`: https://tox.readthedocs.io/en/latest/
 .. _`pip`: https://pypi.org/project/pip/
 .. _`PyPI`: https://pypi.org/project
+.. _`monitor-server-api`: : https://github.com/CFMTech/monitor-server-api
+.. _`pytest-monitor-backend`: https://github.com/dremdem/pytest-monitor-backend
