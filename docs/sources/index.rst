@@ -15,7 +15,7 @@ Contents:
    installation
    configuration
    run
-   exploitation
+   operating
    remote
    contributing 
    changelog
