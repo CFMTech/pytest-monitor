@@ -112,6 +112,41 @@ def test_monitor_pytest_skip_marker(testdir):
     assert not len(cursor.fetchall())
 
 
+def test_monitor_pytest_skip_marker_on_fixture(testdir):
+    """Make sure that pytest-monitor does the job without impacting user tests."""
+
+    # create a temporary pytest test module
+    testdir.makepyfile("""
+    import pytest
+    import time
+
+    @pytest.fixture
+    def a_fixture():
+        pytest.skip("because this is the scenario being tested")
+
+    def test_skipped(a_fixture):
+        assert True
+
+""")
+
+    # run pytest with the following cmd args
+    result = testdir.runpytest('-v')
+
+    # fnmatch_lines does an assertion internally
+    result.stdout.fnmatch_lines(['*::test_skipped SKIPPED*'])
+
+    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    assert pymon_path.exists()
+
+    # make sure that that we get a '0' exit code for the testsuite
+    result.assert_outcomes(skipped=1)
+
+    db = sqlite3.connect(str(pymon_path))
+    cursor = db.cursor()
+    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    assert not len(cursor.fetchall())
+
+
 def test_bad_markers(testdir):
     """Make sure that pytest-monitor warns about unknown markers."""
     # create a temporary pytest test module

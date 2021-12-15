@@ -227,7 +227,7 @@ def prf_tracer(request):
         ptimes_a = request.session.pytest_monitor.process.cpu_times()
         yield
         ptimes_b = request.session.pytest_monitor.process.cpu_times()
-        if not request.node.monitor_skip_test and request.node.monitor_results:
+        if not request.node.monitor_skip_test and getattr(request.node, "monitor_results", False):
             item_name = request.node.originalname or request.node.name
             item_loc = getattr(request.node, PYTEST_MONITOR_ITEM_LOC_MEMBER)[0]
             request.session.pytest_monitor.add_test_info(item_name, request.module.__name__,
