@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`NEXT`
+* :bug:`#50` Fix a bug where a skipping fixture resulted in an exception during teardown.
+
 * :release:`1.6.2 <2021-08-24>`
 * :bug:`#40` Fix a bug that cause the garbage collector to be disable by default.
 
