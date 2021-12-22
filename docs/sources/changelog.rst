@@ -2,7 +2,7 @@
 Changelog
 =========
 
-* :release:`NEXT`
+* :release:`1.6.3 <2021-12-22>`
 * :bug:`#50` Fix a bug where a skipping fixture resulted in an exception during teardown.
 
 * :release:`1.6.2 <2021-08-24>`
