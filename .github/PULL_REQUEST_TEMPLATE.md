@@ -1,22 +1,28 @@
+<!--
 :tada: Thanks for submitting a PR to `pytest-monitor` :tada:
 
-This template is here to guide you with your submission. Please fill it it thoroughly, but delete any session that seems irrelevant. (It's OK to leave unticked boxes during `WIP` or until details are cleared up).
+This template is here to guide you with your submission. Please fill it in thoroughly, but delete any session that seems irrelevant. (It's OK to leave unticked boxes for draft PRs or until details are cleared up).
 
 Do not hesitate to use the full extent of [Markdown formatting][markdown_formatting] to make your submission clearer and more explicit. You can see a preview of how the text renders by switching to the *Preview* tab just above this panel.
 
 [markdown_formatting]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 
 If all is clear, you can also delete this paragraph!
+-->
 
 # Description
 
+<!--
 Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change. (e.g. is a specific `pytest` version required ?)
+-->
 
-Fixes # (issue)
+Fixes #(issue)
 
 # Type of change
 
+<!--
 Please delete options that are not relevant.
+-->
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
@@ -25,7 +31,9 @@ Please delete options that are not relevant.
 
 # Checklist:
 
+<!--
 If an option is not relevant to your PR, do not delete it but use ~strikethrough formating on it~. This helps keeping track of the entire list.
+-->
 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
@@ -42,4 +50,6 @@ If an option is not relevant to your PR, do not delete it but use ~strikethrough
 
 Do not forget to @ the people that needs to do the review
 
+<!--
 Thanks for contributing! :pray:
+-->
