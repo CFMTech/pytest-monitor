@@ -35,11 +35,16 @@ def collect_ci_info():
 
 
 def determine_scm_revision():
-    for cmd in [r'git rev-parse HEAD', r'p4 changes -m1 \#have']:
+    for scm, cmd in (
+            ('git', r'git rev-parse HEAD'),
+            ('p4', r'p4 changes -m1 \#have')):
         p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         p_out, _ = p.communicate()
         if p.returncode == 0:
-            return p_out.decode().split('\n')[0]
+            scm_ref = p_out.decode(errors='ignore').split('\n')[0]
+            if scm == 'p4':
+                scm_ref = scm_ref.split()[1]
+            return scm_ref
     return ''
 
 
