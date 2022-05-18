@@ -12,7 +12,7 @@ shared: &shared
         - run:
             name: "Setup Environment"
             command: |
-                conda create -n ci ${CI_PYTHON} ${CI_PYTEST} $(cat requirements.txt | tr '\n' ' ') -c https://conda.anaconda.org/conda-forge -y
+                conda create -n ci ${CI_PYTHON} ${CI_PYTEST} $(cat requirements.txt | tr '\n' ' ') mock -c https://conda.anaconda.org/conda-forge -y
                 conda init bash
         - run:
             name: "Prepare Project"
