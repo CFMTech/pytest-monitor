@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :release:`1.6.4 <2022-05-18>`
+* :bug:`#56` Force the CPU frequency to 0 and emit a warning when unable to fetch it from the system.
+* :bug:`#54` Fix a bug that crashes the monitor upon non ASCII characters in commit log under Perforce. Improved P4 change number extraction.
+
 * :release:`1.6.3 <2021-12-22>`
 * :bug:`#50` Fix a bug where a skipping fixture resulted in an exception during teardown.
 

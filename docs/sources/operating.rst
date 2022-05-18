@@ -58,7 +58,7 @@ session. An Execution Context describes much of the machine settings:
 CPU_COUNT (integer)
     Number of online CPUs the machine can use.
 CPU_FREQUENCY_MHZ (integer)
-    Base frequency of the CPUs (in megahertz).
+    Base frequency of the CPUs (in megahertz). Set to 0 if unable to fetch it.
 CPU_VENDOR (TEXT 256 CHAR)
     Full CPU vendor string.
 RAM_TOTAL_MB (INTEGER)
