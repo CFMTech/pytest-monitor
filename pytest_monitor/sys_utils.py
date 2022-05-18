@@ -6,6 +6,7 @@ import psutil
 import socket
 import subprocess
 import sys
+import warnings
 
 
 def collect_ci_info():
@@ -67,7 +68,11 @@ class ExecutionContext:
     def __init__(self):
         self.__cpu_count = multiprocessing.cpu_count()
         self.__cpu_vendor = _get_cpu_string()
-        self.__cpu_freq_base = psutil.cpu_freq().current
+        try:
+            self.__cpu_freq_base = psutil.cpu_freq().current
+        except AttributeError:
+            warnings.warn("Unable to fetch CPU frequency. Forcing it to 0.")
+            self.__cpu_freq_base = 0
         self.__proc_typ = platform.processor()
         self.__tot_mem = int(psutil.virtual_memory().total / 1024**2)
         self.__fqdn = socket.getfqdn()
