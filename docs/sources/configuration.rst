@@ -176,3 +176,19 @@ garbage collector, you just have to set the option `--no-gc` on the command line
 
     bash $> pytest --no-gc
 
+Forcing CPU frequency
+---------------------
+Under some circumstances, you may want to set the CPU frequency instead of asking `pytest-monitor` to compute it.
+To do so, you can either:
+ - ask `pytest-monitor` to use a preset value if it does not manage to compute the CPU frequency
+ - or to not try computing the CPU frequency and use your preset value.
+
+ Two environment variables controls this behaviour:
+ - `PYTEST_MONITOR_CPU_FREQ` allows you to preset a value for the CPU frequency. It must be a float convertible value.
+ This value will be used if `pytest-monitor` cannot compute the CPU frequency. Otherwise, `0.0` will be used as a
+ default value.
+ - `PYTEST_MONITOR_FORCE_CPU_FREQ` instructs `pytest-monitor` to try computing the CPU frequency or not. It expects an
+ integer convertible value. If not set, or if the integer representation of the value is `0`, then `pytest-monitor` will
+ try to compute the cpu frequency and defaults to the usecase describe for the previous environment variable.
+ If it set and not equal to `0`, then we use the value that the environment variable `PYTEST_MONITOR_CPU_FREQ` holds
+ (`0.0` if not set).
