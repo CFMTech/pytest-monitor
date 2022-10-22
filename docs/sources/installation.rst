@@ -11,13 +11,8 @@ Supported environments
 
 **You will need pytest 4.4+ to run pytest-monitor.**
 
-The following versions of Python are supported:
+We support all versions of Python >= 3.6.
 
-- Python 3.5
-- Python 3.6
-- Python 3.7
-
-Support for Python 3.8 is still experimental.
 
 From conda
 ----------

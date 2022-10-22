@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`1.6.5 <2022-10-16>`
+* :bug:`#60` Make sure that when psutil cannot fetch cpu frequency, the fallback mechanism is used.
+
 * :release:`1.6.4 <2022-05-18>`
 * :bug:`#56` Force the CPU frequency to 0 and emit a warning when unable to fetch it from the system.
 * :bug:`#54` Fix a bug that crashes the monitor upon non ASCII characters in commit log under Perforce. Improved P4 change number extraction.

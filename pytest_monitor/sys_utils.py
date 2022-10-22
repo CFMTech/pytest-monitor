@@ -68,11 +68,14 @@ class ExecutionContext:
     def __init__(self):
         self.__cpu_count = multiprocessing.cpu_count()
         self.__cpu_vendor = _get_cpu_string()
-        try:
-            self.__cpu_freq_base = psutil.cpu_freq().current
-        except AttributeError:
-            warnings.warn("Unable to fetch CPU frequency. Forcing it to 0.")
-            self.__cpu_freq_base = 0
+        if int(os.environ.get('PYTEST_MONITOR_FORCE_CPU_FREQ', '0')):
+            self._read_cpu_freq_from_env()
+        else:
+            try:
+                self.__cpu_freq_base = psutil.cpu_freq().current
+            except (AttributeError, NotImplementedError, FileNotFoundError):
+                warnings.warn("Unable to fetch CPU frequency. Trying to read it from environment..")
+                self._read_cpu_freq_from_env()
         self.__proc_typ = platform.processor()
         self.__tot_mem = int(psutil.virtual_memory().total / 1024**2)
         self.__fqdn = socket.getfqdn()
@@ -80,6 +83,13 @@ class ExecutionContext:
         self.__arch = platform.architecture()[0]
         self.__system = '{} - {}'.format(platform.system(), platform.release())
         self.__py_ver = sys.version
+
+    def _read_cpu_freq_from_env(self):
+        try:
+            self.__cpu_freq_base = float(os.environ.get('PYTEST_MONITOR_CPU_FREQ', '0.'))
+        except (ValueError, TypeError):
+            warnings.warn("Wrong type/value while reading cpu frequency from environment. Forcing to 0.0.")
+            self.__cpu_freq_base = 0.0
 
     def to_dict(self):
         return dict(cpu_count=self.cpu_count,
