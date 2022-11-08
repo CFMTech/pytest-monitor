@@ -25,25 +25,7 @@ Code evolution
 Extending your application with new features, or fixing its bugs, might have an impact on the core of your program. The performance of large applications or libraries can be difficult to assess, but by monitoring resource consumption, `pytest-monitor` allows you to check that despite code udpates, the performance of your code remains within desirable limits.
 
 
-Example
--------
+Usage
+-----
 
-.. code-block:: python
-
-    import pytest
-    import time
-
-
-    # Tests are run and monitored by default: no boilerplate code needed
-    def test_sleep1():
-        time.sleep(1)
-
-    # Run as a test, but do not monitor:
-    @pytest.mark.monitor_skip_test
-    def test_sleep2():
-        time.sleep(2)
-
-    # Support for parametrized tests (monitored by default):
-    @pytest.mark.parametrize(('range_max', 'other'), [(10, "10"), (100, "100"), (1000, "1000"), (10000, "10000")])
-    def test_heavy(range_max, other):
-        assert len(['a' * i for i in range(range_max)]) == range_max
+Simply run pytest as usual: pytest-monitor is active by default as soon as it is installed. After running your first session, a .pymon sqlite database will be accessible in the directory where pytest was run.
