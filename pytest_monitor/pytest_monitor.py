@@ -143,9 +143,7 @@ def pytest_runtest_setup(item):
     mark_to_del = []
     for set_marker in item_markers.keys():
         if set_marker not in PYTEST_MONITOR_VALID_MARKERS:
-            warnings.warn(
-                f"Nothing known about marker {set_marker}. Marker will be dropped."
-            )
+            warnings.warn("Nothing known about marker {}. Marker will be dropped.".format(set_marker))
             mark_to_del.append(set_marker)
         if set_marker in PYTEST_MONITOR_DEPRECATED_MARKERS:
             warnings.warn(
