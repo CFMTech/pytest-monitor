@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 import json
 import pathlib
-import pytest
 import sqlite3
+
+import pytest
 
 
 def test_monitor_basic_test(testdir):
     """Make sure that pytest-monitor does the job without impacting user tests."""
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
     import time
 
 
@@ -17,15 +19,16 @@ def test_monitor_basic_test(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""")
+"""
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-vv', '--tag', 'version=12.3.5')
+    result = testdir.runpytest("-vv", "--tag", "version=12.3.5")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_ok PASSED*'])
+    result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the test suite
@@ -33,19 +36,22 @@ def test_monitor_basic_test(testdir):
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert 1 == len(cursor.fetchall())  # current test
     cursor = db.cursor()
-    tags = json.loads(cursor.execute('SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;').fetchone()[0])
-    assert 'description' not in tags
-    assert 'version' in tags
-    assert tags['version'] == "12.3.5"
+    tags = json.loads(
+        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0]
+    )
+    assert "description" not in tags
+    assert "version" in tags
+    assert tags["version"] == "12.3.5"
 
 
 def test_monitor_basic_test_description(testdir):
     """Make sure that pytest-monitor does the job without impacting user tests."""
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
     import time
 
 
@@ -54,15 +60,18 @@ def test_monitor_basic_test_description(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""")
+"""
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-vv', '--description', '"Test"', '--tag', 'version=12.3.5')
+    result = testdir.runpytest(
+        "-vv", "--description", '"Test"', "--tag", "version=12.3.5"
+    )
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_ok PASSED*'])
+    result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the test suite
@@ -70,21 +79,23 @@ def test_monitor_basic_test_description(testdir):
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert 1 == len(cursor.fetchall())  # current test
     cursor = db.cursor()
-    tags = json.loads(cursor.execute('SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;').fetchone()[0])
-    assert 'description' in tags
-    assert tags['description'] == '"Test"'
-    assert 'version' in tags
-    assert tags['version'] == "12.3.5"
+    tags = json.loads(
+        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0]
+    )
+    assert "description" in tags
+    assert tags["description"] == '"Test"'
+    assert "version" in tags
+    assert tags["version"] == "12.3.5"
 
 
 def test_monitor_pytest_skip_marker(testdir):
     """Make sure that pytest-monitor does the job without impacting user tests."""
-
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
     import pytest
     import time
 
@@ -92,15 +103,16 @@ def test_monitor_pytest_skip_marker(testdir):
     def test_skipped():
         assert True
 
-""")
+"""
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_skipped SKIPPED*'])
+    result.stdout.fnmatch_lines(["*::test_skipped SKIPPED*"])
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -108,15 +120,15 @@ def test_monitor_pytest_skip_marker(testdir):
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert not len(cursor.fetchall())
 
 
 def test_monitor_pytest_skip_marker_on_fixture(testdir):
     """Make sure that pytest-monitor does the job without impacting user tests."""
-
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
     import pytest
     import time
 
@@ -127,15 +139,16 @@ def test_monitor_pytest_skip_marker_on_fixture(testdir):
     def test_skipped(a_fixture):
         assert True
 
-""")
+"""
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_skipped SKIPPED*'])
+    result.stdout.fnmatch_lines(["*::test_skipped SKIPPED*"])
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -143,14 +156,15 @@ def test_monitor_pytest_skip_marker_on_fixture(testdir):
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert not len(cursor.fetchall())
 
 
 def test_bad_markers(testdir):
     """Make sure that pytest-monitor warns about unknown markers."""
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
         import pytest
         import time
 
@@ -161,16 +175,18 @@ def test_bad_markers(testdir):
             x = ['a' * i for i in range(100)]
             assert len(x) == 100
 
-    """)
+    """
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_ok PASSED*',
-                                 '*Nothing known about marker monitor_bad_marker*'])
+    result.stdout.fnmatch_lines(
+        ["*::test_ok PASSED*", "*Nothing known about marker monitor_bad_marker*"]
+    )
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -178,14 +194,15 @@ def test_bad_markers(testdir):
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert 1 == len(cursor.fetchall())  # current test
 
 
 def test_monitor_skip_module(testdir):
     """Make sure that pytest-monitor correctly understand the monitor_skip_test marker."""
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
 import pytest
 import time
 
@@ -198,16 +215,21 @@ def test_ok_not_monitored():
 
 def test_another_function_ok_not_monitored():
     assert True
-""")
+"""
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_ok_not_monitored PASSED*',
-                                 '*::test_another_function_ok_not_monitored PASSED*'])
+    result.stdout.fnmatch_lines(
+        [
+            "*::test_ok_not_monitored PASSED*",
+            "*::test_another_function_ok_not_monitored PASSED*",
+        ]
+    )
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -215,14 +237,15 @@ def test_another_function_ok_not_monitored():
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert not len(cursor.fetchall())  # Nothing ran
 
 
 def test_monitor_skip_test(testdir):
     """Make sure that pytest-monitor correctly understand the monitor_skip_test marker."""
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
     import pytest
     import time
 
@@ -233,15 +256,16 @@ def test_monitor_skip_test(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""")
+"""
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_not_monitored PASSED*'])
+    result.stdout.fnmatch_lines(["*::test_not_monitored PASSED*"])
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -249,15 +273,15 @@ def test_monitor_skip_test(testdir):
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert not len(cursor.fetchall())  # nothing monitored
 
 
 def test_monitor_skip_test_if(testdir):
     """Make sure that pytest-monitor correctly understand the monitor_skip_test_if marker."""
-
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
     import pytest
     import time
 
@@ -268,23 +292,25 @@ def test_monitor_skip_test_if(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-    
+
     @pytest.mark.monitor_skip_test_if(False)
     def test_monitored():
         time.sleep(0.1)
         x = ['a' *i for i in range(100)]
         assert len(x) == 100
 
-""")
+"""
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_not_monitored PASSED*',
-                                 '*::test_monitored PASSED*'])
+    result.stdout.fnmatch_lines(
+        ["*::test_not_monitored PASSED*", "*::test_monitored PASSED*"]
+    )
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -292,15 +318,15 @@ def test_monitor_skip_test_if(testdir):
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert 1 == len(cursor.fetchall())
 
 
 def test_monitor_no_db(testdir):
     """Make sure that pytest-monitor correctly understand the monitor_skip_test_if marker."""
-
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
     import pytest
     import time
 
@@ -316,18 +342,18 @@ def test_monitor_no_db(testdir):
         x = ['a' *i for i in range(100)]
         assert len(x) == 100
 
-""")
+"""
+    )
 
-    wrn = 'pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring.'
+    wrn = "pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring."
     with pytest.warns(UserWarning, match=wrn):
         # run pytest with the following cmd args
-        result = testdir.runpytest('--no-db', '-v')
+        result = testdir.runpytest("--no-db", "-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_it PASSED*',
-                                 '*::test_that PASSED*'])
+    result.stdout.fnmatch_lines(["*::test_it PASSED*", "*::test_that PASSED*"])
 
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert not pymon_path.exists()
 
     # make sure that that we get a '0' exit code for the testsuite
@@ -336,21 +362,22 @@ def test_monitor_no_db(testdir):
 
 def test_monitor_basic_output(testdir):
     """Make sure that pytest-monitor does not repeat captured output (issue #26)."""
-
     # create a temporary pytest test module
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
         def test_it():
             print('Hello World')
-    """)
+    """
+    )
 
-    wrn = 'pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring.'
+    wrn = "pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring."
     with pytest.warns(UserWarning, match=wrn):
         # run pytest with the following cmd args
-        result = testdir.runpytest('--no-db', '-s', '-vv')
+        result = testdir.runpytest("--no-db", "-s", "-vv")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(['*::test_it Hello World*'])
-    assert "Hello World" != result.stdout.get_lines_after('*Hello World')[0]
+    result.stdout.fnmatch_lines(["*::test_it Hello World*"])
+    assert "Hello World" != result.stdout.get_lines_after("*Hello World")[0]
 
     # make sure that that we get a '0' exit code for the testsuite
     result.assert_outcomes(passed=1)
@@ -358,32 +385,33 @@ def test_monitor_basic_output(testdir):
 
 def test_monitor_with_doctest(testdir):
     """Make sure that pytest-monitor does not fail to run doctest."""
-
     # create a temporary pytest test module
-    testdir.makepyfile('''
+    testdir.makepyfile(
+        '''
         def run(a, b):
             """
             >>> run(3, 30)
             33
             """
             return a + b
-    ''')
+    '''
+    )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest('--doctest-modules', '-vv')
+    result = testdir.runpytest("--doctest-modules", "-vv")
 
     # make sure that that we get a '0' exit code for the testsuite
     result.assert_outcomes(passed=1)
-    pymon_path = pathlib.Path(str(testdir)) / '.pymon'
+    pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
 
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
-    cursor.execute('SELECT ITEM FROM TEST_METRICS;')
+    cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert not len(cursor.fetchall())
 
     pymon_path.unlink()
-    result = testdir.runpytest('--doctest-modules', '--no-monitor', '-vv')
+    result = testdir.runpytest("--doctest-modules", "--no-monitor", "-vv")
 
     # make sure that that we get a '0' exit code for the testsuite
     result.assert_outcomes(passed=1)
