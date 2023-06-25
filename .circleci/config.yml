@@ -23,8 +23,8 @@ aliases:
         - /^pytest-monitor-.*/
   matrix: &build-matrix
       parameters:
-        python: [ "3.6", "3.7", "3.8", "3.9", "3.10" ]
-        pytest: [ "4.6", "5.4", "6.1", "7" ]
+        python: [ "3.8", "3.9", "3.10", "3.11" ]
+        pytest: [ "6.1", "7" ]
       exclude:
         - pytest: "4.6"
           python: "3.8"
