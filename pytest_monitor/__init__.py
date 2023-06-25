@@ -1,2 +1,3 @@
-__version__ = "1.6.6"
-__author__ = "Jean-Sebastien Dieu"
+import importlib.metadata
+
+__version__ = importlib.metadata.version("pytest-monitor")
