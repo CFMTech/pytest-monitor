@@ -22,6 +22,15 @@ The following instructions describe how to create your development environment u
 
        conda install --file requirements.txt -n pytest-monitor-dev -c https://conda.anaconda.org/conda-forge -c defaults
         
+#. Make sure to have pip install or install it if missing:
+
+    .. code-block:: bash
+
+        # Check for pip
+        conda list | grep pip
+        # Install if needed
+        conda install -n pytest-monitor-dev pip -c https://conda.anaconda.org/conda-forge
+
 #. Activate your environment:
 
     .. code-block:: bash
@@ -32,7 +41,7 @@ The following instructions describe how to create your development environment u
 
     .. code-block:: bash
 
-       python setup.py develop
+       python -m pip install -e .
 
 #. You're done!
 
