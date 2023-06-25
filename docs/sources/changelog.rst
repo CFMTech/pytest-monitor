@@ -4,7 +4,7 @@ Changelog
 
 * :release:`1.6.6 <2023-05-06>`
 * :bug:`#64` Prepare version 1.7.0 of pytest-monitor. Last version to support Python <= 3.7 and all pytest <= 5.*
-* :bug:`Reworked CI workflow` Improve and fix some CI issues, notably one that may cause python to not be the requested one but a more recent one.
+* :bug:`#0` Improve and fix some CI issues, notably one that may cause python to not be the requested one but a more recent one.
 
 * :release:`1.6.5 <2022-10-16>`
 * :bug:`#60` Make sure that when psutil cannot fetch cpu frequency, the fallback mechanism is used.
