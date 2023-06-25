@@ -172,12 +172,16 @@ commands:
 
 # Workflow definition
 workflows:
-  PR:
+  standard:
     jobs:
       - build:
           matrix: *build-matrix
           name: "build-py<< matrix.python >>-pytest << matrix.pytest >>"
           filters: *PR-only
+      - publish:
+          requires:
+            - build
+          filters: *official-tag
 
   nightly:
     triggers:
@@ -188,16 +192,6 @@ workflows:
       - build:
           python: "3"
           pytest: "7"
-
-  deploy:
-    jobs:
-      - build:
-          matrix: *build-matrix
-          name: "build-py<< matrix.python >>-pytest << matrix.pytest >>"
-          filters: *official-tag
-      - publish:
-          requires:
-            - build
 
 
 jobs:
