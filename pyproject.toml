@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.distutils.bdist_wheel]
+universal = false
+
+[project]
+name = "pytest-monitor"
+authors = [
+    {name = "Jean-Sébastien Dieu", email = "dieu.jsebastien@yahoo.com"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "pytest",
+    "requests",
+    "psutil>=5.1.0",
+    "memory_profiler>=0.58",
+    "wheel",
+]
+description = "A pytest plugin designed for analyzing resource usage during tests."
+license = {text = "MIT"}
+maintainers = [
+    {name = "Jean-Sébastien Dieu", email = "dieu.jsebastien@yahoo.com"},
+]
+readme = "README.rst"
+requires-python = ">=3.8"
+version = "1.7.0"
+
+[project.urls]
+"Source" = "https://github.com/CFMTech/pytest-monitor"
+"Tracker" = "https://github.com/CFMTech/pytest-monitor/issues"
+"Documentation" = "https://pytest-monitor.readthedocs.io/"
+"Homepage" = "https://pytest-monitor.readthedocs.io/"
+
+[project.entry-points.pytest11]
+monitor = "pytest_monitor.pytest_monitor"

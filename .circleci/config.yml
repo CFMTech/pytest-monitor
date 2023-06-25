@@ -91,13 +91,13 @@ commands:
                   micromamba create -n project
                   channels=$(echo << parameters.channels >> | sed "s/ / -c /g")
                   requirements=$(cat requirements.txt | tr '\n' ' ')
-                  micromamba install -n project -y python=<< parameters.python >> $requirements -c $channels
+                  micromamba install -n project -y python=<< parameters.python >> pip $requirements -c $channels
             - run:
                 name: "Install project in environment"
                 command: |
                   eval "$(micromamba shell hook --shell=bash)"
                   micromamba activate project
-                  python setup.py develop
+                  python -m pip install -e .
             - run:
                 name: "Dumping env"
                 command: |
@@ -158,7 +158,7 @@ commands:
           command: |
             eval "$(micromamba shell hook --shell=bash)"
             micromamba activate project
-            python setup.py sdist bdist_wheel
+            python -m build
   publish-project:
     description: "Send sdist and wheels to Pypi"
     steps:
@@ -213,7 +213,7 @@ jobs:
     docker: *image
     steps:
       - make-env:
-          extra_deps: twine setuptools wheel
+          extra_deps: twine setuptools build
           channels: https://conda.anaconda.org/conda-forge defaults anaconda
           publish_mode: true
       - inject-pypi
