@@ -1,350 +1,221 @@
 version: 2.1
 
-# Pipeline template
-shared: &shared
-    docker:
-        - image: continuumio/miniconda3
-          environment:
-             BASH_ENV: ~/.bashrc
-    working_directory: ~/pytest-monitor.ci
+aliases:
+  docker-image: &image
+    - image: mambaorg/micromamba
+  filter-pr-only: &PR-only
+    branches:
+      ignore:
+        - master
+    tags:
+      ignore:
+        - /.*/
+  filter-master-only: &master-only
+    branches:
+      only:
+        - master
+  filter-tags-only: &official-tag
+    branches:
+      ignore:
+        - /.*/
+    tags:
+      only:
+        - /^pytest-monitor-.*/
+  matrix: &build-matrix
+      parameters:
+        python: [ "3.6", "3.7", "3.8", "3.9", "3.10" ]
+        pytest: [ "4.6", "5.4", "6.1", "7" ]
+      exclude:
+        - pytest: "4.6"
+          python: "3.8"
+        - pytest: "4.6"
+          python: "3.9"
+        - pytest: "4.6"
+          python: "3.10"
+        - pytest: "5.4"
+          python: "3.9"
+        - pytest: "5.4"
+          python: "3.10"
+        - pytest: "6.1"
+          python: "3.9"
+        - pytest: "6.1"
+          python: "3.10"
+        - pytest: "7"
+          python: "3.6"
+
+commands:
+  make-env:
+    description: "Create a brand new environment"
+    parameters:
+      python:
+        type: string
+        default: "3"
+        description: "Python version to use for building"
+      pytest:
+        type: string
+        default: "7"
+        description: "Pytest version to use for testing"
+      extra_deps:
+        type: string
+        default: ""
+        description: "Extra dependencies to install"
+      channels:
+        type: string
+        default: "https://conda.anaconda.org/conda-forge"
+        description: "List of channels for fetching packages"
+      publish_mode:
+        type: boolean
+        default: false
+        description: "If true, does not pin versions in requirements.txt"
     steps:
-        - checkout
-        - run:
-            name: "Setup Environment"
-            command: |
-                conda create -n ci ${CI_PYTHON} ${CI_PYTEST} $(cat requirements.txt | tr '\n' ' ') mock -c https://conda.anaconda.org/conda-forge -y
-                conda init bash
-        - run:
-            name: "Prepare Project"
-            command: |
-                conda activate ci
-                python setup.py develop
-        - run:
-            name: "Testing"
-            command: |
-                conda init bash
-                conda activate ci
-                mkdir test-results
-                pytest --junit-xml=test-results/junit.xml -v
-        - store_test_results:
-            path: test-results
-        - store_artifacts:
-            path: test-results
+      - when:
+          condition:
+            not: << parameters.publish_mode >>
+          steps:
+            - checkout
+            - run:
+                name: "Apply dependency constraints"
+                command: |
+                  if [ "<< parameters.pytest >>" != "" ]; then
+                    sed -i 's/pytest/pytest=<< parameters.pytest >>/g' requirements.txt
+                  fi
+                  if [ "<< parameters.extra_deps >>" != "" ]; then
+                    for dep in << parameters.extra_deps >>
+                    do 
+                      echo $dep >> requirements.txt
+                    done
+                  fi
+            - run:
+                name: "Create environment"
+                command: |
+                  micromamba create -n project
+                  channels=$(echo << parameters.channels >> | sed "s/ / -c /g")
+                  requirements=$(cat requirements.txt | tr '\n' ' ')
+                  micromamba install -n project -y python=<< parameters.python >> $requirements -c $channels
+            - run:
+                name: "Install project in environment"
+                command: |
+                  eval "$(micromamba shell hook --shell=bash)"
+                  micromamba activate project
+                  python setup.py develop
+            - run:
+                name: "Dumping env"
+                command: |
+                  micromamba env export --name project --explicit > manifest.txt
+            - store_artifacts:
+                path: manifest.txt
+      - when:
+          condition: << parameters.publish_mode >>
+          steps:
+            - checkout
+            - run:
+                name: "Create environment"
+                command: |
+                  micromamba create -n project
+                  channels=$(echo << parameters.channels >> | sed "s/ / -c /g")
+                  requirements=$(cat requirements.txt | tr '\n' ' ')
+                  micromamba install -n project -y python=<< parameters.python >> $requirements -c $channels
+                  micromamba install -n project -y << parameters.extra_deps >> -c $channels
+
+  test-project:
+    description: "Run all the test and store the results"
+    parameters:
+      runner:
+        type: string
+        default: "pytest"
+        description: "Test executor"
+      params:
+        type: string
+        default: "-v"
+        description: "Test executor parameters"
+    steps:
+      - run:
+          name: "Launch test"
+          command: |
+            eval "$(micromamba shell hook --shell=bash)"
+            micromamba activate project
+            mkdir test-results
+            << parameters.runner >> <<parameters.params >> --junit-xml=test-results/junit.xml
+      - store_test_results:
+          path: test-results/junit.xml
+      - store_artifacts:
+          path: test-results/junit.xml
+  inject-pypi:
+    description: "Inject pypi credentials"
+    steps:
+      - run:
+          name: "Setup Pypi"
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = __token__" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+
+  package-project:
+    description: "Package project"
+    steps:
+      - run:
+          name: "Make Packages"
+          command: |
+            eval "$(micromamba shell hook --shell=bash)"
+            micromamba activate project
+            python setup.py sdist bdist_wheel
+  publish-project:
+    description: "Send sdist and wheels to Pypi"
+    steps:
+      - run:
+          name: "Publish"
+          command: |
+            eval "$(micromamba shell hook --shell=bash)"
+            micromamba activate project
+            twine upload dist/*
+          
 
 # Workflow definition
 workflows:
-    standard:
-        jobs:
-            - pytestmonitor-py36-pytest44:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py36-pytest45:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py36-pytest46:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py36-pytest50:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py36-pytest51:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py36-pytest52:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py36-pytest53:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py36-pytest54:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py36-pytest60:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py36-pytest61:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py37-pytest44:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py37-pytest45:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py37-pytest46:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py37-pytest50:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py37-pytest51:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py37-pytest52:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py37-pytest53:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py37-pytest54:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py37-pytest60:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py37-pytest61:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py38-pytest46:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py38-pytest52:
-                filters:
-                    tags:
-                        only: /.*/
-            - pytestmonitor-py38-pytest53:
-              filters:
-                  tags:
-                      only: /.*/
-            - pytestmonitor-py38-pytest54:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py38-pytest60:
-                  filters:
-                      tags:
-                          only: /.*/
-            - pytestmonitor-py38-pytest61:
-                  filters:
-                      tags:
-                          only: /.*/
-            - deploy:
-                requires:
-                    - pytestmonitor-py36-pytest44
-                    - pytestmonitor-py36-pytest45
-                    - pytestmonitor-py36-pytest46
-                    - pytestmonitor-py36-pytest50
-                    - pytestmonitor-py36-pytest51
-                    - pytestmonitor-py36-pytest52
-                    - pytestmonitor-py36-pytest53
-                    - pytestmonitor-py36-pytest54
-                    - pytestmonitor-py36-pytest60
-                    - pytestmonitor-py36-pytest61
-                    - pytestmonitor-py37-pytest44
-                    - pytestmonitor-py37-pytest45
-                    - pytestmonitor-py37-pytest46
-                    - pytestmonitor-py37-pytest50
-                    - pytestmonitor-py37-pytest51
-                    - pytestmonitor-py37-pytest52
-                    - pytestmonitor-py37-pytest53
-                    - pytestmonitor-py37-pytest54
-                    - pytestmonitor-py37-pytest60
-                    - pytestmonitor-py37-pytest61
-                    - pytestmonitor-py38-pytest46
-                    - pytestmonitor-py38-pytest52
-                    - pytestmonitor-py38-pytest53
-                    - pytestmonitor-py38-pytest54
-                    - pytestmonitor-py38-pytest60
-                    - pytestmonitor-py38-pytest61
-                filters:
-                    tags:
-                        only: /^[a-zA-Z].*/
-                    branches:
-                        ignore: /.*/
-    nightly:
-        triggers:
-            - schedule:
-                cron: "0 0 * * *"
-                filters:
-                    branches:
-                        only:
-                            - master
-        jobs:
-            - nightly_build
+  PR:
+    jobs:
+      - build:
+          matrix: *build-matrix
+          name: "build-py<< matrix.python >>-pytest << matrix.pytest >>"
+          filters: *PR-only
 
-# Jobs definition
+  deploy:
+    jobs:
+      - publish:
+          filters: *official-tag
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters: *master-only
+    jobs:
+      - build:
+          python: "3"
+          pytest: "7"
+
+
 jobs:
-    pytestmonitor-py36-pytest44:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=4.4'
-        <<: *shared
-    pytestmonitor-py36-pytest45:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=4.5'
-        <<: *shared
-    pytestmonitor-py36-pytest46:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=4.6'
-        <<: *shared
-    pytestmonitor-py36-pytest50:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=5.0'
-        <<: *shared
-    pytestmonitor-py36-pytest51:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=5.1'
-        <<: *shared
-    pytestmonitor-py36-pytest52:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=5.2'
-        <<: *shared
-    pytestmonitor-py36-pytest53:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=5.3'
-        <<: *shared
-    pytestmonitor-py36-pytest54:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=5.4'
-        <<: *shared
-    pytestmonitor-py36-pytest60:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=6.0'
-        <<: *shared
-    pytestmonitor-py36-pytest61:
-        environment:
-            CI_PYTHON: 'python=3.6'
-            CI_PYTEST: 'pytest=6.1'
-        <<: *shared
-    pytestmonitor-py37-pytest44:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=4.4'
-        <<: *shared
-    pytestmonitor-py37-pytest45:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=4.5'
-        <<: *shared
-    pytestmonitor-py37-pytest46:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=4.6'
-        <<: *shared
-    pytestmonitor-py37-pytest50:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=5.0'
-        <<: *shared
-    pytestmonitor-py37-pytest51:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=5.1'
-        <<: *shared
-    pytestmonitor-py37-pytest52:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=5.2'
-        <<: *shared
-    pytestmonitor-py37-pytest53:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=5.3'
-        <<: *shared
-    pytestmonitor-py37-pytest54:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=5.4'
-        <<: *shared
-    pytestmonitor-py37-pytest60:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=6.0'
-        <<: *shared
-    pytestmonitor-py37-pytest61:
-        environment:
-            CI_PYTHON: 'python=3.7'
-            CI_PYTEST: 'pytest=6.1'
-        <<: *shared
-    pytestmonitor-py38-pytest46:
-        environment:
-            CI_PYTHON: 'python=3.8'
-            CI_PYTEST: 'pytest=4.6'
-        <<: *shared
-    pytestmonitor-py38-pytest52:
-        environment:
-            CI_PYTHON: 'python=3.8'
-            CI_PYTEST: 'pytest=5.2'
-        <<: *shared
-    pytestmonitor-py38-pytest53:
-        environment:
-            CI_PYTHON: 'python=3.8'
-            CI_PYTEST: 'pytest=5.3'
-        <<: *shared
-    pytestmonitor-py38-pytest54:
-        environment:
-            CI_PYTHON: 'python=3.8'
-            CI_PYTEST: 'pytest=5.4'
-        <<: *shared
-    pytestmonitor-py38-pytest60:
-        environment:
-            CI_PYTHON: 'python=3.8'
-            CI_PYTEST: 'pytest=6.0'
-        <<: *shared
-    pytestmonitor-py38-pytest61:
-        environment:
-            CI_PYTHON: 'python=3.8'
-            CI_PYTEST: 'pytest=6.1'
-        <<: *shared
-    nightly_build:
-        environment:
-            CI_PYTHON: 'python'
-            CI_PYTEST: 'pytest'
-        <<: *shared
-    deploy:
-        docker:
-            - image: continuumio/miniconda3
-              environment:
-                BASH_ENV: ~/.bashrc
-        working_directory: ~/pytest-monitor.ci
-        steps:
-            - checkout
-            - run:
-                name: "Prepare for deployment"
-                command: |
-                    conda create -n ci python=3.8 twine wheel setuptools -c https://conda.anaconda.org/conda-forge -c defaults -c anaconda -y
-                    conda init bash
-                    echo -e "[pypi]" >> ~/.pypirc
-                    echo -e "username = __token__" >> ~/.pypirc
-                    echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
-
-            - run:
-                name: "Package Project"
-                command: |
-                    conda activate ci
-                    python setup.py sdist bdist_wheel
-            - run:
-                name: "Publish"
-                command: |
-                    conda init bash
-                    conda activate ci
-                    twine upload dist/*
+  build:
+    docker: *image
+    parameters:
+        python:
+            type: string
+        pytest:
+            type: string
+    steps:
+      - make-env:
+          extra_deps: mock
+          python: << parameters.python >>
+          pytest: << parameters.pytest >>
+      - test-project
+  publish:
+    docker: *image
+    steps:
+      - make-env:
+          extra_deps: twine setuptools wheel
+          channels: https://conda.anaconda.org/conda-forge defaults anaconda
+          publish_mode: true
+      - inject-pypi
+      - package-project
+      - publish-project

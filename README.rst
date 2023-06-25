@@ -150,7 +150,7 @@ If you encounter any problem, please `file an issue`_ along with a detailed desc
 Author
 ------
 
-The main author of `pytest-monitor` is Jean-Sébastien Dieu, who can be reached at jean-sebastien.dieu@cfm.fr.
+The main author of `pytest-monitor` is Jean-Sébastien Dieu, who can be reached at jdieu@salsify.fr.
 
 ----
 
