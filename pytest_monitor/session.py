@@ -50,9 +50,7 @@ class PyTestMonitorSession:
     def get_env_id(self, env):
         db, remote = None, None
         if self.__db:
-            row = self.__db.query(
-                "SELECT ENV_H FROM EXECUTION_CONTEXTS WHERE ENV_H= ?", (env.hash(),)
-            )
+            row = self.__db.query("SELECT ENV_H FROM EXECUTION_CONTEXTS WHERE ENV_H= ?", (env.hash(),))
             db = row[0] if row else None
         if self.__remote:
             r = requests.get(f"{self.__remote}/contexts/{env.hash()}")
@@ -111,16 +109,12 @@ class PyTestMonitorSession:
         db_id, remote_id = self.__eid
         if self.__db and db_id is None:
             self.__db.insert_execution_context(env)
-            db_id = self.__db.query(
-                "select ENV_H from EXECUTION_CONTEXTS where ENV_H = ?", (env.hash(),)
-            )[0]
+            db_id = self.__db.query("select ENV_H from EXECUTION_CONTEXTS where ENV_H = ?", (env.hash(),))[0]
         if self.__remote and remote_id is None:
             # We must postpone that to be run at the end of the pytest session.
             r = requests.post(f"{self.__remote}/contexts/", json=env.to_dict())
             if r.status_code != HTTPStatus.CREATED:
-                warnings.warn(
-                    f"Cannot insert execution context in remote server (rc={r.status_code}! Deactivating..."
-                )
+                warnings.warn(f"Cannot insert execution context in remote server (rc={r.status_code}! Deactivating...")
                 self.__remote = ""
             else:
                 remote_id = json.loads(r.text)["h"]
@@ -130,9 +124,7 @@ class PyTestMonitorSession:
         def dummy():
             return True
 
-        memuse = memory_profiler.memory_usage(
-            (dummy,), max_iterations=1, max_usage=True
-        )
+        memuse = memory_profiler.memory_usage((dummy,), max_iterations=1, max_usage=True)
         self.__mem_usage_base = memuse[0] if type(memuse) is list else memuse
 
     def add_test_info(
