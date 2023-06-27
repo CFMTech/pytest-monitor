@@ -22,9 +22,7 @@ PYTEST_MONITOR_VALID_MARKERS = {
     "monitor_test_if": (True, "monitor_force_test", lambda x: bool(x), False),
 }
 PYTEST_MONITOR_DEPRECATED_MARKERS = {}
-PYTEST_MONITOR_ITEM_LOC_MEMBER = (
-    "_location" if tuple(pytest.__version__.split(".")) < ("5", "3") else "location"
-)
+PYTEST_MONITOR_ITEM_LOC_MEMBER = "_location" if tuple(pytest.__version__.split(".")) < ("5", "3") else "location"
 
 PYTEST_MONITORING_ENABLED = True
 
@@ -46,9 +44,7 @@ def pytest_addoption(parser):
         help="Set this option to distinguish parametrized tests given their values."
         " This requires the parameters to be stringifiable.",
     )
-    group.addoption(
-        "--no-monitor", action="store_true", dest="mtr_none", help="Disable all traces"
-    )
+    group.addoption("--no-monitor", action="store_true", dest="mtr_none", help="Disable all traces")
     group.addoption(
         "--remote-server",
         action="store",
@@ -72,15 +68,13 @@ def pytest_addoption(parser):
         "--force-component",
         action="store",
         dest="mtr_force_component",
-        help="Force the component to be set at the given value for the all tests run"
-        " in this session.",
+        help="Force the component to be set at the given value for the all tests run" " in this session.",
     )
     group.addoption(
         "--component-prefix",
         action="store",
         dest="mtr_component_prefix",
-        help="Prefix each found components with the given value (applies to all tests"
-        " run in this session).",
+        help="Prefix each found components with the given value (applies to all tests" " run in this session).",
     )
     group.addoption(
         "--no-gc",
@@ -105,13 +99,10 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "monitor_skip_test: mark test to be executed but not monitored."
-    )
+    config.addinivalue_line("markers", "monitor_skip_test: mark test to be executed but not monitored.")
     config.addinivalue_line(
         "markers",
-        "monitor_skip_test_if(cond): mark test to be executed but "
-        "not monitored if cond is verified.",
+        "monitor_skip_test_if(cond): mark test to be executed but " "not monitored if cond is verified.",
     )
     config.addinivalue_line(
         "markers",
@@ -135,20 +126,14 @@ def pytest_runtest_setup(item):
     """
     if not PYTEST_MONITORING_ENABLED:
         return
-    item_markers = {
-        mark.name: mark
-        for mark in item.iter_markers()
-        if mark and mark.name.startswith("monitor_")
-    }
+    item_markers = {mark.name: mark for mark in item.iter_markers() if mark and mark.name.startswith("monitor_")}
     mark_to_del = []
     for set_marker in item_markers.keys():
         if set_marker not in PYTEST_MONITOR_VALID_MARKERS:
             warnings.warn("Nothing known about marker {}. Marker will be dropped.".format(set_marker))
             mark_to_del.append(set_marker)
         if set_marker in PYTEST_MONITOR_DEPRECATED_MARKERS:
-            warnings.warn(
-                f"Marker {set_marker} is deprecated. Consider upgrading your tests"
-            )
+            warnings.warn(f"Marker {set_marker} is deprecated. Consider upgrading your tests")
 
     for marker in mark_to_del:
         del item_markers[marker]
@@ -220,9 +205,7 @@ def pytest_pyfunc_call(pyfuncitem):
             return e
 
     def prof():
-        m = memory_profiler.memory_usage(
-            (wrapped_function, ()), max_iterations=1, max_usage=True, retval=True
-        )
+        m = memory_profiler.memory_usage((wrapped_function, ()), max_iterations=1, max_usage=True, retval=True)
         if isinstance(m[1], BaseException):  # Do we have any outcome?
             raise m[1]
         memuse = m[0][0] if type(m[0]) is list else m[0]
@@ -249,26 +232,12 @@ def pytest_sessionstart(session):
     Instantiate a monitor session to save collected metrics.
     We yield at the end to let pytest pursue the execution.
     """
-    if (
-        session.config.option.mtr_force_component
-        and session.config.option.mtr_component_prefix
-    ):
-        raise pytest.UsageError(
-            "Invalid usage: --force-component and --component-prefix are incompatible options!"
-        )
-    if (
-        session.config.option.mtr_no_db
-        and not session.config.option.mtr_remote
-        and not session.config.option.mtr_none
-    ):
-        warnings.warn(
-            "pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring."
-        )
+    if session.config.option.mtr_force_component and session.config.option.mtr_component_prefix:
+        raise pytest.UsageError("Invalid usage: --force-component and --component-prefix are incompatible options!")
+    if session.config.option.mtr_no_db and not session.config.option.mtr_remote and not session.config.option.mtr_none:
+        warnings.warn("pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring.")
         session.config.option.mtr_none = True
-    component = (
-        session.config.option.mtr_force_component
-        or session.config.option.mtr_component_prefix
-    )
+    component = session.config.option.mtr_force_component or session.config.option.mtr_component_prefix
     if session.config.option.mtr_component_prefix:
         component += ".{user_component}"
     if not component:
@@ -278,17 +247,13 @@ def pytest_sessionstart(session):
         if (session.config.option.mtr_none or session.config.option.mtr_no_db)
         else session.config.option.mtr_db_out
     )
-    remote = (
-        None if session.config.option.mtr_none else session.config.option.mtr_remote
-    )
+    remote = None if session.config.option.mtr_none else session.config.option.mtr_remote
     session.pytest_monitor = PyTestMonitorSession(
         db=db, remote=remote, component=component, scope=session.config.option.mtr_scope
     )
     global PYTEST_MONITORING_ENABLED
     PYTEST_MONITORING_ENABLED = not session.config.option.mtr_none
-    session.pytest_monitor.compute_info(
-        session.config.option.mtr_description, session.config.option.mtr_tags
-    )
+    session.pytest_monitor.compute_info(session.config.option.mtr_description, session.config.option.mtr_tags)
     yield
 
 
@@ -329,9 +294,7 @@ def prf_tracer(request):
         ptimes_a = request.session.pytest_monitor.process.cpu_times()
         yield
         ptimes_b = request.session.pytest_monitor.process.cpu_times()
-        if not request.node.monitor_skip_test and getattr(
-            request.node, "monitor_results", False
-        ):
+        if not request.node.monitor_skip_test and getattr(request.node, "monitor_results", False):
             item_name = request.node.originalname or request.node.name
             item_loc = getattr(request.node, PYTEST_MONITOR_ITEM_LOC_MEMBER)[0]
             request.session.pytest_monitor.add_test_info(

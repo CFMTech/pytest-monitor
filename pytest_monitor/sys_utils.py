@@ -15,11 +15,7 @@ def collect_ci_info():
     # Test for jenkins
     if "BUILD_NUMBER" in os.environ:
         if "BRANCH_NAME" in os.environ or "JOB_NAME" in os.environ:
-            br = (
-                os.environ["BRANCH_NAME"]
-                if "BRANCH_NAME" in os.environ
-                else os.environ["JOB_NAME"]
-            )
+            br = os.environ["BRANCH_NAME"] if "BRANCH_NAME" in os.environ else os.environ["JOB_NAME"]
             d = dict(
                 pipeline_branch=br,
                 pipeline_build_no=os.environ["BUILD_NUMBER"],
@@ -58,9 +54,7 @@ def collect_ci_info():
 
 def determine_scm_revision():
     for scm, cmd in (("git", r"git rev-parse HEAD"), ("p4", r"p4 changes -m1 \#have")):
-        p = subprocess.Popen(
-            cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-        )
+        p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         p_out, _ = p.communicate()
         if p.returncode == 0:
             scm_ref = p_out.decode(errors="ignore").split("\n", maxsplit=1)[0]
@@ -74,11 +68,7 @@ def _get_cpu_string():
     if platform.system().lower() == "darwin":
         old_path = os.environ["PATH"]
         os.environ["PATH"] = old_path + ":" + "/usr/sbin"
-        ret = (
-            subprocess.check_output("sysctl -n machdep.cpu.brand_string", shell=True)
-            .decode()
-            .strip()
-        )
+        ret = subprocess.check_output("sysctl -n machdep.cpu.brand_string", shell=True).decode().strip()
         os.environ["PATH"] = old_path
         return ret
     if platform.system().lower() == "linux":
@@ -99,9 +89,7 @@ class ExecutionContext:
             try:
                 self.__cpu_freq_base = psutil.cpu_freq().current
             except (AttributeError, NotImplementedError, FileNotFoundError):
-                warnings.warn(
-                    "Unable to fetch CPU frequency. Trying to read it from environment.."
-                )
+                warnings.warn("Unable to fetch CPU frequency. Trying to read it from environment..")
                 self._read_cpu_freq_from_env()
         self.__proc_typ = platform.processor()
         self.__tot_mem = int(psutil.virtual_memory().total / 1024**2)
@@ -113,13 +101,9 @@ class ExecutionContext:
 
     def _read_cpu_freq_from_env(self):
         try:
-            self.__cpu_freq_base = float(
-                os.environ.get("PYTEST_MONITOR_CPU_FREQ", "0.")
-            )
+            self.__cpu_freq_base = float(os.environ.get("PYTEST_MONITOR_CPU_FREQ", "0."))
         except (ValueError, TypeError):
-            warnings.warn(
-                "Wrong type/value while reading cpu frequency from environment. Forcing to 0.0."
-            )
+            warnings.warn("Wrong type/value while reading cpu frequency from environment. Forcing to 0.0.")
             self.__cpu_freq_base = 0.0
 
     def to_dict(self):
