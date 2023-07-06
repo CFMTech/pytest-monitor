@@ -16,7 +16,7 @@ def test_monitor_no_component(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -36,7 +36,7 @@ def test_monitor_no_component(testdir):
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     assert 1 == len(cursor.fetchall())
     cursor.execute(
-        "SELECT ITEM FROM TEST_METRICS WHERE COMPONENT != '' AND ITEM LIKE '%test_ok';",
+        "SELECT ITEM FROM TEST_METRICS WHERE COMPONENT != '' AND ITEM LIKE '%test_ok';"
     )
     assert not len(cursor.fetchall())
 
@@ -54,7 +54,7 @@ def test_monitor_force_component(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -75,7 +75,7 @@ def test_monitor_force_component(testdir):
     assert 1 == len(cursor.fetchall())
     cursor.execute(
         "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_force_ok%';",
+        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_force_ok%';"
     )
     assert 1 == len(cursor.fetchall())
 
@@ -94,7 +94,7 @@ def test_monitor_prefix_component(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -115,12 +115,12 @@ def test_monitor_prefix_component(testdir):
     assert 1 == len(cursor.fetchall())
     cursor.execute(
         "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';",
+        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';"
     )
     assert not len(cursor.fetchall())
     cursor.execute(
         "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component.internal' AND ITEM LIKE '%test_prefix_ok%';",
+        " WHERE COMPONENT == 'my_component.internal' AND ITEM LIKE '%test_prefix_ok%';"
     )
     assert 1 == len(cursor.fetchall())
 
@@ -138,7 +138,7 @@ def test_monitor_prefix_without_component(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -159,6 +159,6 @@ def test_monitor_prefix_without_component(testdir):
     assert 1 == len(cursor.fetchall())
     cursor.execute(
         "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';",
+        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';"
     )
     assert 1 == len(cursor.fetchall())

@@ -17,7 +17,7 @@ def test_monitor_no_ci(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     envs = dict()
@@ -73,7 +73,7 @@ def test_monitor_jenkins_ci(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     def check_that(the_result, match):
@@ -159,7 +159,7 @@ def test_monitor_gitlab_ci(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     def check_that(the_result, match):
@@ -236,7 +236,7 @@ def test_monitor_travis_ci(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     def check_that(the_result, match):
@@ -313,7 +313,7 @@ def test_monitor_circle_ci(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     def check_that(the_result, match):
@@ -390,7 +390,7 @@ def test_monitor_drone_ci(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     def check_that(the_result, match):

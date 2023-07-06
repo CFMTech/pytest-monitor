@@ -19,7 +19,7 @@ def test_monitor_basic_test(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -40,7 +40,7 @@ def test_monitor_basic_test(testdir):
     assert 1 == len(cursor.fetchall())  # current test
     cursor = db.cursor()
     tags = json.loads(
-        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0],
+        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0]
     )
     assert "description" not in tags
     assert "version" in tags
@@ -60,12 +60,12 @@ def test_monitor_basic_test_description(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
     result = testdir.runpytest(
-        "-vv", "--description", '"Test"', "--tag", "version=12.3.5",
+        "-vv", "--description", '"Test"', "--tag", "version=12.3.5"
     )
 
     # fnmatch_lines does an assertion internally
@@ -83,7 +83,7 @@ def test_monitor_basic_test_description(testdir):
     assert 1 == len(cursor.fetchall())  # current test
     cursor = db.cursor()
     tags = json.loads(
-        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0],
+        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0]
     )
     assert "description" in tags
     assert tags["description"] == '"Test"'
@@ -103,7 +103,7 @@ def test_monitor_pytest_skip_marker(testdir):
     def test_skipped():
         assert True
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -139,7 +139,7 @@ def test_monitor_pytest_skip_marker_on_fixture(testdir):
     def test_skipped(a_fixture):
         assert True
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -175,7 +175,7 @@ def test_bad_markers(testdir):
             x = ['a' * i for i in range(100)]
             assert len(x) == 100
 
-    """,
+    """
     )
 
     # run pytest with the following cmd args
@@ -183,7 +183,7 @@ def test_bad_markers(testdir):
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(
-        ["*::test_ok PASSED*", "*Nothing known about marker monitor_bad_marker*"],
+        ["*::test_ok PASSED*", "*Nothing known about marker monitor_bad_marker*"]
     )
 
     pymon_path = pathlib.Path(str(testdir)) / ".pymon"
@@ -215,7 +215,7 @@ def test_ok_not_monitored():
 
 def test_another_function_ok_not_monitored():
     assert True
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -226,7 +226,7 @@ def test_another_function_ok_not_monitored():
         [
             "*::test_ok_not_monitored PASSED*",
             "*::test_another_function_ok_not_monitored PASSED*",
-        ],
+        ]
     )
 
     pymon_path = pathlib.Path(str(testdir)) / ".pymon"
@@ -256,7 +256,7 @@ def test_monitor_skip_test(testdir):
         x = ['a' * i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -299,7 +299,7 @@ def test_monitor_skip_test_if(testdir):
         x = ['a' *i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     # run pytest with the following cmd args
@@ -307,7 +307,7 @@ def test_monitor_skip_test_if(testdir):
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(
-        ["*::test_not_monitored PASSED*", "*::test_monitored PASSED*"],
+        ["*::test_not_monitored PASSED*", "*::test_monitored PASSED*"]
     )
 
     pymon_path = pathlib.Path(str(testdir)) / ".pymon"
@@ -342,7 +342,7 @@ def test_monitor_no_db(testdir):
         x = ['a' *i for i in range(100)]
         assert len(x) == 100
 
-""",
+"""
     )
 
     wrn = "pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring."
@@ -367,7 +367,7 @@ def test_monitor_basic_output(testdir):
         """
         def test_it():
             print('Hello World')
-    """,
+    """
     )
 
     wrn = "pytest-monitor: No storage specified but monitoring is requested. Disabling monitoring."
@@ -394,7 +394,7 @@ def test_monitor_with_doctest(testdir):
             33
             """
             return a + b
-    ''',
+    '''
     )
 
     # run pytest with the following cmd args
