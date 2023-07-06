@@ -59,7 +59,7 @@ def collect_ci_info():
 def determine_scm_revision():
     for scm, cmd in (("git", r"git rev-parse HEAD"), ("p4", r"p4 changes -m1 \#have")):
         p = subprocess.Popen(
-            cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+            cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE,
         )
         p_out, _ = p.communicate()
         if p.returncode == 0:
@@ -100,7 +100,7 @@ class ExecutionContext:
                 self.__cpu_freq_base = psutil.cpu_freq().current
             except (AttributeError, NotImplementedError, FileNotFoundError):
                 warnings.warn(
-                    "Unable to fetch CPU frequency. Trying to read it from environment.."
+                    "Unable to fetch CPU frequency. Trying to read it from environment..",
                 )
                 self._read_cpu_freq_from_env()
         self.__proc_typ = platform.processor()
@@ -114,11 +114,11 @@ class ExecutionContext:
     def _read_cpu_freq_from_env(self):
         try:
             self.__cpu_freq_base = float(
-                os.environ.get("PYTEST_MONITOR_CPU_FREQ", "0.")
+                os.environ.get("PYTEST_MONITOR_CPU_FREQ", "0."),
             )
         except (ValueError, TypeError):
             warnings.warn(
-                "Wrong type/value while reading cpu frequency from environment. Forcing to 0.0."
+                "Wrong type/value while reading cpu frequency from environment. Forcing to 0.0.",
             )
             self.__cpu_freq_base = 0.0
 
