@@ -13,18 +13,17 @@ import psutil
 def collect_ci_info():
     d = dict()
     # Test for jenkins
-    if "BUILD_NUMBER" in os.environ:
-        if "BRANCH_NAME" in os.environ or "JOB_NAME" in os.environ:
-            br = (
-                os.environ["BRANCH_NAME"]
-                if "BRANCH_NAME" in os.environ
-                else os.environ["JOB_NAME"]
-            )
-            d = dict(
-                pipeline_branch=br,
-                pipeline_build_no=os.environ["BUILD_NUMBER"],
-                __ci__="jenkinsci",
-            )
+    if "BUILD_NUMBER" in os.environ and ("BRANCH_NAME" in os.environ or "JOB_NAME" in os.environ):
+        br = (
+            os.environ["BRANCH_NAME"]
+            if "BRANCH_NAME" in os.environ
+            else os.environ["JOB_NAME"]
+        )
+        d = dict(
+            pipeline_branch=br,
+            pipeline_build_no=os.environ["BUILD_NUMBER"],
+            __ci__="jenkinsci",
+        )
     # Test for CircleCI
     if "CIRCLE_JOB" in os.environ and "CIRCLE_BUILD_NUM" in os.environ:
         d = dict(
@@ -73,7 +72,7 @@ def determine_scm_revision():
 def _get_cpu_string():
     if platform.system().lower() == "darwin":
         old_path = os.environ["PATH"]
-        os.environ["PATH"] = old_path + ":" + "/usr/sbin"
+        os.environ["PATH"] = f"{old_path}:/usr/sbin"
         ret = (
             subprocess.check_output("sysctl -n machdep.cpu.brand_string", shell=True)
             .decode()
