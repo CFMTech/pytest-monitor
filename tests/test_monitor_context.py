@@ -77,10 +77,10 @@ def test_force_cpu_freq(testdir):
 
 
 @pytest.mark.parametrize(
-    "effect", [AttributeError, NotImplementedError, FileNotFoundError]
+    "effect", [AttributeError, NotImplementedError, FileNotFoundError],
 )
 def test_when_cpu_freq_cannot_fetch_frequency_set_freq_by_using_fallback(
-    effect, testdir
+    effect, testdir,
 ):
     """Make sure that pytest-monitor fallback takes value of CPU FREQ from special env var"""
     # create a temporary pytest test module
@@ -102,7 +102,7 @@ def test_when_cpu_freq_cannot_fetch_frequency_set_freq_by_using_fallback(
 
 
 @pytest.mark.parametrize(
-    "effect", [AttributeError, NotImplementedError, FileNotFoundError]
+    "effect", [AttributeError, NotImplementedError, FileNotFoundError],
 )
 def test_when_cpu_freq_cannot_fetch_frequency_set_freq_to_0(effect, testdir):
     """Make sure that pytest-monitor's fallback mechanism is efficient enough."""

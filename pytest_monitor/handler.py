@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS TEST_SESSIONS(
     RUN_DATE varchar(64), -- Date of test run
     SCM_ID varchar(128), -- SCM change id
     RUN_DESCRIPTION json
-);"""
+);""",
         )
         cursor.execute(
             """
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS TEST_METRICS (
     MEM_USAGE float, -- Max resident memory used.
     FOREIGN KEY (ENV_H) REFERENCES EXECUTION_CONTEXTS(ENV_H),
     FOREIGN KEY (SESSION_H) REFERENCES TEST_SESSIONS(SESSION_H)
-);"""
+);""",
         )
         cursor.execute(
             """
@@ -129,6 +129,6 @@ CREATE TABLE IF NOT EXISTS EXECUTION_CONTEXTS (
    SYSTEM_INFO varchar(256),
    PYTHON_INFO varchar(512)
 );
-"""
+""",
         )
         self.__cnx.commit()
