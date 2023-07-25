@@ -224,6 +224,7 @@ def pytest_pyfunc_call(pyfuncitem):
 def pytest_make_parametrize_id(config, val, argname):
     if config.option.mtr_want_explicit_ids:
         return f"{argname}={val}"
+    return None
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -258,7 +259,7 @@ def pytest_sessionstart(session):
 
 
 @pytest.fixture(autouse=True, scope="module")
-def prf_module_tracer(request):
+def _prf_module_tracer(request):
     if not PYTEST_MONITORING_ENABLED:
         yield
     else:
@@ -287,7 +288,7 @@ def prf_module_tracer(request):
 
 
 @pytest.fixture(autouse=True)
-def prf_tracer(request):
+def _prf_tracer(request):
     if not PYTEST_MONITORING_ENABLED:
         yield
     else:

@@ -15,7 +15,7 @@ def test_not_monitored():
         b_continue = t_delta < 5
 
 
-@pytest.mark.monitor_test
+@pytest.mark.monitor_test()
 def test_force_monitor():
     t_a = time.time()
     b_continue = True

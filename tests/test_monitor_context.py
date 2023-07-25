@@ -19,15 +19,15 @@ def test_ok():
 
 
 def get_nb_metrics_with_cpu_freq(path):
-    pymon_path = pathlib.Path(str(path)) / ".pymon"
-    db = sqlite3.connect(path.as_posix())
+    db_path = path / ".pymon"
+    db = sqlite3.connect(db_path.as_posix())
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
     nb_metrics = len(cursor.fetchall())
     cursor = db.cursor()
     cursor.execute("SELECT CPU_FREQUENCY_MHZ FROM EXECUTION_CONTEXTS;")
     rows = cursor.fetchall()
-    assert 1 == len(rows)
+    assert len(rows) == 1
     cpu_freq = rows[0][0]
     return nb_metrics, cpu_freq
 
@@ -48,10 +48,12 @@ def test_force_cpu_freq_set_0_use_psutil(testdir):
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
-    # make sure that that we get a '0' exit code for the test suite
+    # make sure that we get a '0' exit code for the test suite
     result.assert_outcomes(passed=1)
 
-    assert 1, 3000 == get_nb_metrics_with_cpu_freq(testdir)
+    nb_metrics, cpu_freq = get_nb_metrics_with_cpu_freq(pathlib.Path(str(testdir)))
+
+    assert (nb_metrics, cpu_freq) == (1, 3000)
 
 
 def test_force_cpu_freq(testdir):
@@ -70,18 +72,16 @@ def test_force_cpu_freq(testdir):
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
-    # make sure that that we get a '0' exit code for the test suite
+    # make sure that we get a '0' exit code for the test suite
     result.assert_outcomes(passed=1)
 
-    assert 1, 3000 == get_nb_metrics_with_cpu_freq(testdir)
+    nb_metrics, cpu_freq = get_nb_metrics_with_cpu_freq(pathlib.Path(str(testdir)))
+
+    assert (nb_metrics, cpu_freq) == (1, 3000)
 
 
-@pytest.mark.parametrize(
-    "effect", [AttributeError, NotImplementedError, FileNotFoundError]
-)
-def test_when_cpu_freq_cannot_fetch_frequency_set_freq_by_using_fallback(
-    effect, testdir
-):
+@pytest.mark.parametrize("effect", [AttributeError, NotImplementedError, FileNotFoundError])
+def test_when_cpu_freq_cannot_fetch_frequency_set_freq_by_using_fallback(effect, testdir):
     """Make sure that pytest-monitor fallback takes value of CPU FREQ from special env var"""
     # create a temporary pytest test module
     testdir.makepyfile(TEST_CONTENT)
@@ -95,15 +95,15 @@ def test_when_cpu_freq_cannot_fetch_frequency_set_freq_by_using_fallback(
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
-    # make sure that that we get a '0' exit code for the test suite
+    # make sure that we get a '0' exit code for the test suite
     result.assert_outcomes(passed=1)
 
-    assert 1, 3000 == get_nb_metrics_with_cpu_freq(testdir)
+    nb_metrics, cpu_freq = get_nb_metrics_with_cpu_freq(pathlib.Path(str(testdir)))
+
+    assert (nb_metrics, cpu_freq) == (1, 3000)
 
 
-@pytest.mark.parametrize(
-    "effect", [AttributeError, NotImplementedError, FileNotFoundError]
-)
+@pytest.mark.parametrize("effect", [AttributeError, NotImplementedError, FileNotFoundError])
 def test_when_cpu_freq_cannot_fetch_frequency_set_freq_to_0(effect, testdir):
     """Make sure that pytest-monitor's fallback mechanism is efficient enough."""
     # create a temporary pytest test module
@@ -116,10 +116,12 @@ def test_when_cpu_freq_cannot_fetch_frequency_set_freq_to_0(effect, testdir):
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
-    # make sure that that we get a '0' exit code for the test suite
+    # make sure that we get a '0' exit code for the test suite
     result.assert_outcomes(passed=1)
 
-    assert 1, 0 == get_nb_metrics_with_cpu_freq(testdir)
+    nb_metrics, cpu_freq = get_nb_metrics_with_cpu_freq(pathlib.Path(str(testdir)))
+
+    assert (nb_metrics, cpu_freq) == (1, 0)
 
 
 @mock.patch("pytest_monitor.sys_utils.psutil.cpu_freq", return_value=None)
@@ -133,7 +135,9 @@ def test_when_cpu_freq_cannot_fetch_frequency(cpu_freq_mock, testdir):
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
-    # make sure that that we get a '0' exit code for the test suite
+    # make sure that we get a '0' exit code for the test suite
     result.assert_outcomes(passed=1)
 
-    assert 1, 0 == get_nb_metrics_with_cpu_freq(testdir)
+    nb_metrics, cpu_freq = get_nb_metrics_with_cpu_freq(pathlib.Path(str(testdir)))
+
+    assert (nb_metrics, cpu_freq) == (1, 0)

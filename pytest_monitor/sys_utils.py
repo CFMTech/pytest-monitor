@@ -11,45 +11,43 @@ import psutil
 
 
 def collect_ci_info():
-    d = dict()
     # Test for jenkins
-    if "BUILD_NUMBER" in os.environ:
-        if "BRANCH_NAME" in os.environ or "JOB_NAME" in os.environ:
-            br = os.environ["BRANCH_NAME"] if "BRANCH_NAME" in os.environ else os.environ["JOB_NAME"]
-            d = dict(
-                pipeline_branch=br,
-                pipeline_build_no=os.environ["BUILD_NUMBER"],
-                __ci__="jenkinsci",
-            )
+    if "BUILD_NUMBER" in os.environ and ("BRANCH_NAME" in os.environ or "JOB_NAME" in os.environ):
+        br = os.environ["BRANCH_NAME"] if "BRANCH_NAME" in os.environ else os.environ["JOB_NAME"]
+        return {
+            "pipeline_branch": br,
+            "pipeline_build_no": os.environ["BUILD_NUMBER"],
+            "__ci__": "jenkinsci",
+        }
     # Test for CircleCI
     if "CIRCLE_JOB" in os.environ and "CIRCLE_BUILD_NUM" in os.environ:
-        d = dict(
-            pipeline_branch=os.environ["CIRCLE_JOB"],
-            pipeline_build_no=os.environ["CIRCLE_BUILD_NUM"],
-            __ci__="circleci",
-        )
+        return {
+            "pipeline_branch": os.environ["CIRCLE_JOB"],
+            "pipeline_build_no": os.environ["CIRCLE_BUILD_NUM"],
+            "__ci__": "circleci",
+        }
     # Test for TravisCI
     if "TRAVIS_BUILD_NUMBER" in os.environ and "TRAVIS_BUILD_ID" in os.environ:
-        d = dict(
-            pipeline_branch=os.environ["TRAVIS_BUILD_ID"],
-            pipeline_build_no=os.environ["TRAVIS_BUILD_NUMBER"],
-            __ci__="travisci",
-        )
+        return {
+            "pipeline_branch": os.environ["TRAVIS_BUILD_ID"],
+            "pipeline_build_no": os.environ["TRAVIS_BUILD_NUMBER"],
+            "__ci__": "travisci",
+        }
     # Test for DroneCI
     if "DRONE_REPO_BRANCH" in os.environ and "DRONE_BUILD_NUMBER" in os.environ:
-        d = dict(
-            pipeline_branch=os.environ["DRONE_REPO_BRANCH"],
-            pipeline_build_no=os.environ["DRONE_BUILD_NUMBER"],
-            __ci__="droneci",
-        )
+        return {
+            "pipeline_branch": os.environ["DRONE_REPO_BRANCH"],
+            "pipeline_build_no": os.environ["DRONE_BUILD_NUMBER"],
+            "__ci__": "droneci",
+        }
     # Test for Gitlab CI
     if "CI_JOB_NAME" in os.environ and "CI_PIPELINE_ID" in os.environ:
-        d = dict(
-            pipeline_branch=os.environ["CI_JOB_NAME"],
-            pipeline_build_no=os.environ["CI_PIPELINE_ID"],
-            __ci__="gitlabci",
-        )
-    return d
+        return {
+            "pipeline_branch": os.environ["CI_JOB_NAME"],
+            "pipeline_build_no": os.environ["CI_PIPELINE_ID"],
+            "__ci__": "gitlabci",
+        }
+    return {}
 
 
 def determine_scm_revision():
@@ -68,9 +66,9 @@ def _get_cpu_string():
     if platform.system().lower() == "darwin":
         old_path = os.environ["PATH"]
         os.environ["PATH"] = old_path + ":" + "/usr/sbin"
-        ret = subprocess.check_output("sysctl -n machdep.cpu.brand_string", shell=True).decode().strip()
+        ret = subprocess.check_output("sysctl -n machdep.cpu.brand_string", shell=True)
         os.environ["PATH"] = old_path
-        return ret
+        return ret.decode().strip()
     if platform.system().lower() == "linux":
         with open("/proc/cpuinfo", "r", encoding="utf-8") as f:
             lines = [i for i in f if i.startswith("model name")]
@@ -107,19 +105,19 @@ class ExecutionContext:
             self.__cpu_freq_base = 0.0
 
     def to_dict(self):
-        return dict(
-            cpu_count=self.cpu_count,
-            cpu_frequency=self.cpu_frequency,
-            cpu_type=self.cpu_type,
-            cpu_vendor=self.cpu_vendor,
-            ram_total=self.ram_total,
-            machine_node=self.fqdn,
-            machine_type=self.machine,
-            machine_arch=self.architecture,
-            system_info=self.system_info,
-            python_info=self.python_info,
-            h=self.hash(),
-        )
+        return {
+            "cpu_count": self.cpu_count,
+            "cpu_frequency": self.cpu_frequency,
+            "cpu_type": self.cpu_type,
+            "cpu_vendor": self.cpu_vendor,
+            "ram_total": self.ram_total,
+            "machine_node": self.fqdn,
+            "machine_type": self.machine,
+            "machine_arch": self.architecture,
+            "system_info": self.system_info,
+            "python_info": self.python_info,
+            "h": self.compute_hash(),
+        }
 
     @property
     def cpu_count(self):
@@ -161,7 +159,7 @@ class ExecutionContext:
     def python_info(self):
         return self.__py_ver
 
-    def hash(self):
+    def compute_hash(self):
         hr = hashlib.md5()
         hr.update(str(self.__cpu_count).encode())
         hr.update(str(self.__cpu_freq_base).encode())

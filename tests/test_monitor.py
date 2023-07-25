@@ -37,11 +37,9 @@ def test_monitor_basic_test(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())  # current test
+    assert len(cursor.fetchall()) == 1
     cursor = db.cursor()
-    tags = json.loads(
-        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0]
-    )
+    tags = json.loads(cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0])
     assert "description" not in tags
     assert "version" in tags
     assert tags["version"] == "12.3.5"
@@ -64,9 +62,7 @@ def test_monitor_basic_test_description(testdir):
     )
 
     # run pytest with the following cmd args
-    result = testdir.runpytest(
-        "-vv", "--description", '"Test"', "--tag", "version=12.3.5"
-    )
+    result = testdir.runpytest("-vv", "--description", '"Test"', "--tag", "version=12.3.5")
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
@@ -80,11 +76,9 @@ def test_monitor_basic_test_description(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())  # current test
+    assert len(cursor.fetchall()) == 1
     cursor = db.cursor()
-    tags = json.loads(
-        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0]
-    )
+    tags = json.loads(cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;").fetchone()[0])
     assert "description" in tags
     assert tags["description"] == '"Test"'
     assert "version" in tags
@@ -182,9 +176,7 @@ def test_bad_markers(testdir):
     result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(
-        ["*::test_ok PASSED*", "*Nothing known about marker monitor_bad_marker*"]
-    )
+    result.stdout.fnmatch_lines(["*::test_ok PASSED*", "*Nothing known about marker monitor_bad_marker*"])
 
     pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
@@ -195,7 +187,7 @@ def test_bad_markers(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())  # current test
+    assert len(cursor.fetchall()) == 1
 
 
 def test_monitor_skip_module(testdir):
@@ -306,9 +298,7 @@ def test_monitor_skip_test_if(testdir):
     result = testdir.runpytest("-v")
 
     # fnmatch_lines does an assertion internally
-    result.stdout.fnmatch_lines(
-        ["*::test_not_monitored PASSED*", "*::test_monitored PASSED*"]
-    )
+    result.stdout.fnmatch_lines(["*::test_not_monitored PASSED*", "*::test_monitored PASSED*"])
 
     pymon_path = pathlib.Path(str(testdir)) / ".pymon"
     assert pymon_path.exists()
@@ -319,7 +309,7 @@ def test_monitor_skip_test_if(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())
+    assert len(cursor.fetchall()) == 1
 
 
 def test_monitor_no_db(testdir):

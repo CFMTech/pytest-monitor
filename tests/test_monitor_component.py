@@ -34,10 +34,8 @@ def test_monitor_no_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())
-    cursor.execute(
-        "SELECT ITEM FROM TEST_METRICS WHERE COMPONENT != '' AND ITEM LIKE '%test_ok';"
-    )
+    assert len(cursor.fetchall()) == 1
+    cursor.execute("SELECT ITEM FROM TEST_METRICS WHERE COMPONENT != '' AND ITEM LIKE '%test_ok';")
     assert not len(cursor.fetchall())
 
 
@@ -72,12 +70,11 @@ def test_monitor_force_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())
+    assert len(cursor.fetchall()) == 1
     cursor.execute(
-        "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_force_ok%';"
+        "SELECT ITEM FROM TEST_METRICS" " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_force_ok%';"
     )
-    assert 1 == len(cursor.fetchall())
+    assert len(cursor.fetchall()) == 1
 
 
 def test_monitor_prefix_component(testdir):
@@ -112,17 +109,15 @@ def test_monitor_prefix_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())
+    assert len(cursor.fetchall()) == 1
     cursor.execute(
-        "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';"
+        "SELECT ITEM FROM TEST_METRICS" " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';"
     )
     assert not len(cursor.fetchall())
     cursor.execute(
-        "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component.internal' AND ITEM LIKE '%test_prefix_ok%';"
+        "SELECT ITEM FROM TEST_METRICS" " WHERE COMPONENT == 'my_component.internal' AND ITEM LIKE '%test_prefix_ok%';"
     )
-    assert 1 == len(cursor.fetchall())
+    assert len(cursor.fetchall()) == 1
 
 
 def test_monitor_prefix_without_component(testdir):
@@ -156,9 +151,8 @@ def test_monitor_prefix_without_component(testdir):
     db = sqlite3.connect(str(pymon_path))
     cursor = db.cursor()
     cursor.execute("SELECT ITEM FROM TEST_METRICS;")
-    assert 1 == len(cursor.fetchall())
+    assert len(cursor.fetchall()) == 1
     cursor.execute(
-        "SELECT ITEM FROM TEST_METRICS"
-        " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';"
+        "SELECT ITEM FROM TEST_METRICS" " WHERE COMPONENT == 'my_component' AND ITEM LIKE '%test_prefix_ok%';"
     )
-    assert 1 == len(cursor.fetchall())
+    assert len(cursor.fetchall()) == 1
