@@ -20,7 +20,7 @@ def test_monitor_no_ci(testdir):
 """
     )
 
-    envs = dict()
+    envs = {}
     for k in [
         "CIRCLE_BUILD_NUM",
         "CIRCLE_JOB",
@@ -54,7 +54,7 @@ def test_monitor_no_ci(testdir):
     cursor = db.cursor()
     cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;")
     desc = cursor.fetchall()
-    assert 1 == len(desc)  # current test
+    assert len(desc) == 1  # current test
     assert desc[0][0] == "{}"
     for k in envs.keys():
         os.environ[k] = envs[k]
@@ -90,15 +90,13 @@ def test_monitor_jenkins_ci(testdir):
         cursor = db.cursor()
         cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;")
         desc = cursor.fetchall()
-        assert 1 == len(desc)  # current test
+        assert len(desc) == 1  # current test
         assert desc[0][0] == match
         pymon_path.unlink()
 
-    run_description = (
-        '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "jenkinsci"}'
-    )
+    run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "jenkinsci"}'
 
-    envs = dict()
+    envs = {}
     for k in [
         "CIRCLE_BUILD_NUM",
         "CIRCLE_JOB",
@@ -117,11 +115,11 @@ def test_monitor_jenkins_ci(testdir):
             del os.environ[k]
 
     for env, exp in [
-        (dict(BUILD_NUMBER="123"), "{}"),
-        (dict(BUILD_NUMBER="123", JOB_NAME="test"), run_description),
-        (dict(BUILD_NUMBER="123", BRANCH_NAME="test"), run_description),
+        ({"BUILD_NUMBER": "123"}, "{}"),
+        ({"BUILD_NUMBER": "123", "JOB_NAME": "test"}, run_description),
+        ({"BUILD_NUMBER": "123", "BRANCH_NAME": "test"}, run_description),
         (
-            dict(BUILD_NUMBER="123", JOB_NAME="test-123", BRANCH_NAME="test"),
+            {"BUILD_NUMBER": "123", "JOB_NAME": "test-123", "BRANCH_NAME": "test"},
             run_description,
         ),
     ]:
@@ -176,14 +174,12 @@ def test_monitor_gitlab_ci(testdir):
         cursor = db.cursor()
         cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;")
         desc = cursor.fetchall()
-        assert 1 == len(desc)  # current test
+        assert len(desc) == 1  # current test
         assert desc[0][0] == match
         pymon_path.unlink()
 
-    run_description = (
-        '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "gitlabci"}'
-    )
-    envs = dict()
+    run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "gitlabci"}'
+    envs = {}
     for k in [
         "CIRCLE_BUILD_NUM",
         "CIRCLE_JOB",
@@ -202,9 +198,9 @@ def test_monitor_gitlab_ci(testdir):
             del os.environ[k]
 
     for env, exp in [
-        (dict(CI_PIPELINE_ID="123"), "{}"),
-        (dict(CI_PIPELINE_ID="123", CI_JOB_NAME="test"), run_description),
-        (dict(CI_JOB_NAME="123"), "{}"),
+        ({"CI_PIPELINE_ID": "123"}, "{}"),
+        ({"CI_PIPELINE_ID": "123", "CI_JOB_NAME": "test"}, run_description),
+        ({"CI_JOB_NAME": "123"}, "{}"),
     ]:
         if "CI_PIPELINE_ID" in os.environ:
             del os.environ["CI_PIPELINE_ID"]
@@ -253,14 +249,12 @@ def test_monitor_travis_ci(testdir):
         cursor = db.cursor()
         cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;")
         desc = cursor.fetchall()
-        assert 1 == len(desc)  # current test
+        assert len(desc) == 1  # current test
         assert desc[0][0] == match
         pymon_path.unlink()
 
-    run_description = (
-        '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "travisci"}'
-    )
-    envs = dict()
+    run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "travisci"}'
+    envs = {}
     for k in [
         "CIRCLE_BUILD_NUM",
         "CIRCLE_JOB",
@@ -279,9 +273,9 @@ def test_monitor_travis_ci(testdir):
             del os.environ[k]
 
     for env, exp in [
-        (dict(TRAVIS_BUILD_NUMBER="123"), "{}"),
-        (dict(TRAVIS_BUILD_NUMBER="123", TRAVIS_BUILD_ID="test"), run_description),
-        (dict(TRAVIS_BUILD_ID="test-123"), "{}"),
+        ({"TRAVIS_BUILD_NUMBER": "123"}, "{}"),
+        ({"TRAVIS_BUILD_NUMBER": "123", "TRAVIS_BUILD_ID": "test"}, run_description),
+        ({"TRAVIS_BUILD_ID": "test-123"}, "{}"),
     ]:
         if "TRAVIS_BUILD_NUMBER" in os.environ:
             del os.environ["TRAVIS_BUILD_NUMBER"]
@@ -330,14 +324,12 @@ def test_monitor_circle_ci(testdir):
         cursor = db.cursor()
         cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;")
         desc = cursor.fetchall()
-        assert 1 == len(desc)  # current test
+        assert len(desc) == 1  # current test
         assert desc[0][0] == match
         pymon_path.unlink()
 
-    run_description = (
-        '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "circleci"}'
-    )
-    envs = dict()
+    run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "circleci"}'
+    envs = {}
     for k in [
         "CIRCLE_BUILD_NUM",
         "CIRCLE_JOB",
@@ -356,9 +348,9 @@ def test_monitor_circle_ci(testdir):
             del os.environ[k]
 
     for env, exp in [
-        (dict(CIRCLE_BUILD_NUM="123"), "{}"),
-        (dict(CIRCLE_BUILD_NUM="123", CIRCLE_JOB="test"), run_description),
-        (dict(CIRCLE_JOB="test"), "{}"),
+        ({"CIRCLE_BUILD_NUM": "123"}, "{}"),
+        ({"CIRCLE_BUILD_NUM": "123", "CIRCLE_JOB": "test"}, run_description),
+        ({"CIRCLE_JOB": "test"}, "{}"),
     ]:
         if "CIRCLE_BUILD_NUM" in os.environ:
             del os.environ["CIRCLE_BUILD_NUM"]
@@ -407,14 +399,12 @@ def test_monitor_drone_ci(testdir):
         cursor = db.cursor()
         cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;")
         desc = cursor.fetchall()
-        assert 1 == len(desc)  # current test
+        assert len(desc) == 1  # current test
         assert desc[0][0] == match
         pymon_path.unlink()
 
-    run_description = (
-        '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "droneci"}'
-    )
-    envs = dict()
+    run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "droneci"}'
+    envs = {}
     for k in [
         "CIRCLE_BUILD_NUM",
         "CIRCLE_JOB",
@@ -433,9 +423,9 @@ def test_monitor_drone_ci(testdir):
             del os.environ[k]
 
     for env, exp in [
-        (dict(DRONE_BUILD_NUMBER="123"), "{}"),
-        (dict(DRONE_BUILD_NUMBER="123", DRONE_REPO_BRANCH="test"), run_description),
-        (dict(DRONE_REPO_BRANCH="test"), "{}"),
+        ({"DRONE_BUILD_NUMBER": "123"}, "{}"),
+        ({"DRONE_BUILD_NUMBER": "123", "DRONE_REPO_BRANCH": "test"}, run_description),
+        ({"DRONE_REPO_BRANCH": "test"}, "{}"),
     ]:
         if "DRONE_REPO_BRANCH" in os.environ:
             del os.environ["DRONE_REPO_BRANCH"]

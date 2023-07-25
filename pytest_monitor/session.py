@@ -50,10 +50,10 @@ class PyTestMonitorSession:
     def get_env_id(self, env):
         db, remote = None, None
         if self.__db:
-            row = self.__db.query("SELECT ENV_H FROM EXECUTION_CONTEXTS WHERE ENV_H= ?", (env.hash(),))
+            row = self.__db.query("SELECT ENV_H FROM EXECUTION_CONTEXTS WHERE ENV_H= ?", (env.compute_hash(),))
             db = row[0] if row else None
         if self.__remote:
-            r = requests.get(f"{self.__remote}/contexts/{env.hash()}")
+            r = requests.get(f"{self.__remote}/contexts/{env.compute_hash()}")
             remote = None
             if r.status_code == HTTPStatus.OK:
                 remote = json.loads(r.text)
@@ -92,12 +92,12 @@ class PyTestMonitorSession:
         if self.__remote:
             r = requests.post(
                 f"{self.__remote}/sessions/",
-                json=dict(
-                    session_h=self.__session,
-                    run_date=run_date,
-                    scm_ref=scm,
-                    description=json.loads(description),
-                ),
+                json={
+                    "session_h": self.__session,
+                    "run_date": run_date,
+                    "scm_ref": scm,
+                    "description": json.loads(description),
+                },
             )
             if r.status_code != HTTPStatus.CREATED:
                 self.__remote = ""
@@ -109,7 +109,7 @@ class PyTestMonitorSession:
         db_id, remote_id = self.__eid
         if self.__db and db_id is None:
             self.__db.insert_execution_context(env)
-            db_id = self.__db.query("select ENV_H from EXECUTION_CONTEXTS where ENV_H = ?", (env.hash(),))[0]
+            db_id = self.__db.query("select ENV_H from EXECUTION_CONTEXTS where ENV_H = ?", (env.compute_hash(),))[0]
         if self.__remote and remote_id is None:
             # We must postpone that to be run at the end of the pytest session.
             r = requests.post(f"{self.__remote}/contexts/", json=env.to_dict())
@@ -170,22 +170,22 @@ class PyTestMonitorSession:
         if self.__remote and self.remote_env_id is not None:
             r = requests.post(
                 f"{self.__remote}/metrics/",
-                json=dict(
-                    session_h=self.__session,
-                    context_h=self.remote_env_id,
-                    item_start_time=item_start_time,
-                    item_path=item_path,
-                    item=item,
-                    item_variant=item_variant,
-                    item_fs_loc=item_loc,
-                    kind=kind,
-                    component=final_component,
-                    total_time=total_time,
-                    user_time=user_time,
-                    kernel_time=kernel_time,
-                    cpu_usage=cpu_usage,
-                    mem_usage=mem_usage,
-                ),
+                json={
+                    "session_h": self.__session,
+                    "context_h": self.remote_env_id,
+                    "item_start_time": item_start_time,
+                    "item_path": item_path,
+                    "item": item,
+                    "item_variant": item_variant,
+                    "item_fs_loc": item_loc,
+                    "kind": kind,
+                    "component": final_component,
+                    "total_time": total_time,
+                    "user_time": user_time,
+                    "kernel_time": kernel_time,
+                    "cpu_usage": cpu_usage,
+                    "mem_usage": mem_usage,
+                },
             )
             if r.status_code != HTTPStatus.CREATED:
                 self.__remote = ""

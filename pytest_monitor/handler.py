@@ -77,7 +77,7 @@ class DBHandler:
                     exc_context.architecture,
                     exc_context.system_info,
                     exc_context.python_info,
-                    exc_context.hash(),
+                    exc_context.compute_hash(),
                 ),
             )
 
