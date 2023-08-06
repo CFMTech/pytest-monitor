@@ -4,7 +4,7 @@ pytest
 requests
 black
 isort
-flake8=6.0.0
+flake8=6.1.0
 flake8-builtins=2.1.0
 flake8-simplify=0.19.3
 flake8-comprehensions=3.10.1
