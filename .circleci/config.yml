@@ -45,10 +45,14 @@ commands:
         type: string
         default: "7"
         description: "Pytest version to use for testing"
+      add_specific_requirements:
+        type: string
+        default: ""
+        description: "Add specific requirements listed in a file to the environment. "
       extra_deps:
         type: string
         default: ""
-        description: "Extra dependencies to install"
+        description: "Extra dependencies to install (given as a space separated string)"
       channels:
         type: string
         default: "https://conda.anaconda.org/conda-forge"
@@ -74,6 +78,10 @@ commands:
                     do 
                       echo $dep >> requirements.txt
                     done
+                  fi
+                  cat "" >> requirements.txt
+                  if [ "<< parameters.add_specific_requirements >>" != "" ]; then
+                    cat "<< parameters.add_specific_requirements >>" >> requirements.txt
                   fi
             - run:
                 name: "Create environment"
@@ -107,6 +115,27 @@ commands:
                   micromamba install -n project -y python=<< parameters.python >> $requirements -c $channels
                   micromamba install -n project -y << parameters.extra_deps >> -c $channels
 
+  lint-project:
+    description: "Check code style"
+    steps:
+      - run:
+          name: "Check formatting (black)"
+          command: |
+            eval "$(micromamba shell hook --shell=bash)"
+            micromamba activate project
+            black .
+      - run:
+          name: "Check code style (flake8)"
+          command: |
+            eval "$(micromamba shell hook --shell=bash)"
+            micromamba activate project
+            flake8 .
+      - run:
+          name: "Check import order (isort)"
+          command: |
+            eval "$(micromamba shell hook --shell=bash)"
+            micromamba activate project
+            isort .
   test-project:
     description: "Run all the test and store the results"
     parameters:
@@ -164,10 +193,13 @@ commands:
 workflows:
   PR:
     jobs:
+      - lint
       - build:
           matrix: *build-matrix
           name: "build-py<< matrix.python >>-pytest << matrix.pytest >>"
           filters: *PR-only
+          requires:
+            - lint
 
   deploy:
     jobs:
@@ -186,6 +218,12 @@ workflows:
 
 
 jobs:
+  lint:
+    docker: *image
+    steps:
+      - make-env:
+          add_specific_requirements: requirements.dev.txt
+      - lint-project
   build:
     docker: *image
     parameters:
