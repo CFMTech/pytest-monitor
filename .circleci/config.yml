@@ -45,7 +45,7 @@ commands:
         type: string
         default: "7"
         description: "Pytest version to use for testing"
-      add_specific_requirements:
+      add_specific_requirements_file:
         type: string
         default: ""
         description: "Add specific requirements listed in a file to the environment. "
@@ -79,9 +79,9 @@ commands:
                       echo $dep >> requirements.txt
                     done
                   fi
-                  cat "" >> requirements.txt
-                  if [ "<< parameters.add_specific_requirements >>" != "" ]; then
-                    cat "<< parameters.add_specific_requirements >>" >> requirements.txt
+                  echo "" >> requirements.txt
+                  if [ "<< parameters.add_specific_requirements_file >>" != "" ]; then
+                    cat "<< parameters.add_specific_requirements_file >>" >> requirements.txt
                   fi
             - run:
                 name: "Create environment"
@@ -222,7 +222,7 @@ jobs:
     docker: *image
     steps:
       - make-env:
-          add_specific_requirements: requirements.dev.txt
+          add_specific_requirements_file: requirements.dev.txt
       - lint-project
   build:
     docker: *image
