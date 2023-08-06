@@ -20,7 +20,7 @@ The following instructions describe how to create your development environment u
 
     .. code-block:: bash
 
-       conda install --file requirements.txt -n pytest-monitor-dev -c https://conda.anaconda.org/conda-forge -c defaults
+       conda install --file requirements.dev.txt -n pytest-monitor-dev -c https://conda.anaconda.org/conda-forge -c defaults
         
 #. Make sure to have pip install or install it if missing:
 
@@ -41,7 +41,12 @@ The following instructions describe how to create your development environment u
 
     .. code-block:: bash
 
-       python -m pip install -e .
+       python -m pip install -e ".[dev]"
+
+#. Install the pre-commit hooks
+    .. code-block:: bash
+
+       pre-commit install
 
 #. You're done!
 

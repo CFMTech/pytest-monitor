@@ -45,9 +45,9 @@ commands:
         type: string
         default: "7"
         description: "Pytest version to use for testing"
-      add_specific_requirements_file:
+      use_specific_requirements_file:
         type: string
-        default: ""
+        default: "requirements.txt"
         description: "Add specific requirements listed in a file to the environment. "
       extra_deps:
         type: string
@@ -71,17 +71,14 @@ commands:
                 name: "Apply dependency constraints"
                 command: |
                   if [ "<< parameters.pytest >>" != "" ]; then
-                    sed -i 's/pytest/pytest=<< parameters.pytest >>/g' requirements.txt
+                    sed -i 's/pytest/pytest=<< parameters.pytest >>/g' << parameters.use_specific_requirements_file >>
                   fi
+                  echo "" >> << parameters.use_specific_requirements_file >>
                   if [ "<< parameters.extra_deps >>" != "" ]; then
                     for dep in << parameters.extra_deps >>
                     do 
-                      echo $dep >> requirements.txt
+                      echo $dep >> << parameters.use_specific_requirements_file >>
                     done
-                  fi
-                  echo "" >> requirements.txt
-                  if [ "<< parameters.add_specific_requirements_file >>" != "" ]; then
-                    cat "<< parameters.add_specific_requirements_file >>" >> requirements.txt
                   fi
             - run:
                 name: "Create environment"
@@ -222,7 +219,7 @@ jobs:
     docker: *image
     steps:
       - make-env:
-          add_specific_requirements_file: requirements.dev.txt
+          use_specific_requirements_file: requirements.dev.txt
       - lint-project
   build:
     docker: *image
