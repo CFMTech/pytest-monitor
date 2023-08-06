@@ -71,7 +71,7 @@ commands:
                 name: "Apply dependency constraints"
                 command: |
                   if [ "<< parameters.pytest >>" != "" ]; then
-                    sed -i 's/pytest/pytest=<< parameters.pytest >>/g' << parameters.use_specific_requirements_file >>
+                    sed -i 's/^pytest/pytest=<< parameters.pytest >>/g' << parameters.use_specific_requirements_file >>
                   fi
                   echo "" >> << parameters.use_specific_requirements_file >>
                   if [ "<< parameters.extra_deps >>" != "" ]; then
@@ -85,7 +85,7 @@ commands:
                 command: |
                   micromamba create -n project
                   channels=$(echo << parameters.channels >> | sed "s/ / -c /g")
-                  requirements=$(cat requirements.txt | tr '\n' ' ')
+                  requirements=$(cat << parameters.use_specific_requirements_file >> | tr '\n' ' ')
                   micromamba install -n project -y python=<< parameters.python >> pip $requirements -c $channels
             - run:
                 name: "Install project in environment"
