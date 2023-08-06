@@ -16,13 +16,9 @@ import pathlib
 
 
 def read_version():
-    init = (
-        pathlib.Path(__file__).parent.parent.parent / "pytest_monitor" / "__init__.py"
-    )
+    init = pathlib.Path(__file__).parent.parent.parent / "pytest_monitor" / "__init__.py"
     with init.open("r") as pkg_init_f:
-        version_read = [
-            line.strip() for line in pkg_init_f if line.startswith("__version__")
-        ]
+        version_read = [line.strip() for line in pkg_init_f if line.startswith("__version__")]
     if len(version_read) > 1:
         raise ValueError('Multiple version found in "pytest_monitor" package!')
     if not version_read:
@@ -66,7 +62,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "pytest-monitor"
-copyright = "2019, Jean-Sébastien Dieu"
+copyright = "2019, Jean-Sébastien Dieu"  # noqa A001
 author = "Jean-Sébastien Dieu"
 
 # The version info for the project you're documenting, acts as replacement for
