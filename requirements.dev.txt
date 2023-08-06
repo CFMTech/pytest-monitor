@@ -11,3 +11,4 @@ flake8-comprehensions=3.10.1
 flake8-pytest-style=1.6.0
 flake8-return=1.2.0
 flake8-pyproject=1.2.3
+pre-commit=3.3.3
