@@ -64,6 +64,12 @@ def pytest_addoption(parser):
         dest="mtr_no_db",
         help="Do not store results in local db.",
     )
+    group.addoption("--use-postgres",
+        action="store_true",
+        dest="mtr_use_postgres",
+        default=False,
+        help="Use postgres as the database for storing results."
+        )
     group.addoption(
         "--force-component",
         action="store",
@@ -245,12 +251,12 @@ def pytest_sessionstart(session):
         component = "{user_component}"
     db = (
         None
-        if (session.config.option.mtr_none or session.config.option.mtr_no_db)
+        if (session.config.option.mtr_none or session.config.option.mtr_no_db or session.config.option.mtr_use_postgres)
         else session.config.option.mtr_db_out
     )
     remote = None if session.config.option.mtr_none else session.config.option.mtr_remote
     session.pytest_monitor = PyTestMonitorSession(
-        db=db, remote=remote, component=component, scope=session.config.option.mtr_scope
+        db=db, use_postgres=session.config.option.mtr_use_postgres, remote=remote, component=component, scope=session.config.option.mtr_scope
     )
     global PYTEST_MONITORING_ENABLED
     PYTEST_MONITORING_ENABLED = not session.config.option.mtr_none
