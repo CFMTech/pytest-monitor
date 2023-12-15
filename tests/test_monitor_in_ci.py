@@ -33,6 +33,8 @@ def test_monitor_no_ci(testdir):
         "TRAVIS_BUILD_NUMBER",
         "CI_PIPELINE_ID",
         "CI_JOB_NAME",
+        "BITBUCKET_BRANCH",
+        "BITBUCKET_BUILD_NUMBER",
     ]:
         if k in os.environ:
             envs[k] = os.environ[k]
@@ -109,6 +111,8 @@ def test_monitor_jenkins_ci(testdir):
         "TRAVIS_BUILD_NUMBER",
         "CI_PIPELINE_ID",
         "CI_JOB_NAME",
+        "BITBUCKET_BRANCH",
+        "BITBUCKET_BUILD_NUMBER",
     ]:
         if k in os.environ:
             envs[k] = os.environ[k]
@@ -192,6 +196,8 @@ def test_monitor_gitlab_ci(testdir):
         "TRAVIS_BUILD_NUMBER",
         "CI_PIPELINE_ID",
         "CI_JOB_NAME",
+        "BITBUCKET_BRANCH",
+        "BITBUCKET_BUILD_NUMBER",
     ]:
         if k in os.environ:
             envs[k] = os.environ[k]
@@ -267,6 +273,8 @@ def test_monitor_travis_ci(testdir):
         "TRAVIS_BUILD_NUMBER",
         "CI_PIPELINE_ID",
         "CI_JOB_NAME",
+        "BITBUCKET_BRANCH",
+        "BITBUCKET_BUILD_NUMBER",
     ]:
         if k in os.environ:
             envs[k] = os.environ[k]
@@ -342,6 +350,8 @@ def test_monitor_circle_ci(testdir):
         "TRAVIS_BUILD_NUMBER",
         "CI_PIPELINE_ID",
         "CI_JOB_NAME",
+        "BITBUCKET_BRANCH",
+        "BITBUCKET_BUILD_NUMBER",
     ]:
         if k in os.environ:
             envs[k] = os.environ[k]
@@ -417,6 +427,8 @@ def test_monitor_drone_ci(testdir):
         "TRAVIS_BUILD_NUMBER",
         "CI_PIPELINE_ID",
         "CI_JOB_NAME",
+        "BITBUCKET_BRANCH",
+        "BITBUCKET_BUILD_NUMBER",
     ]:
         if k in os.environ:
             envs[k] = os.environ[k]
@@ -442,3 +454,79 @@ def test_monitor_drone_ci(testdir):
         del os.environ["DRONE_REPO_BRANCH"]
     if "DRONE_BUILD_NUMBER" in os.environ:
         del os.environ["DRONE_BUILD_NUMBER"]
+
+def test_monitor_bitbucket_ci(testdir):
+    """Make sure that pytest-monitor correctly handle Bitbucket CI information."""
+    # create a temporary pytest test module
+    testdir.makepyfile(
+        """
+    import time
+
+
+    def test_ok():
+        time.sleep(0.5)
+        x = ['a' * i for i in range(100)]
+        assert len(x) == 100
+
+"""
+    )
+
+    def check_that(the_result, match):
+        # fnmatch_lines does an assertion internally
+        the_result.stdout.fnmatch_lines(["*::test_ok PASSED*"])
+
+        pymon_path = pathlib.Path(str(testdir)) / ".pymon"
+        assert pymon_path.exists()
+
+        # make sure that that we get a '0' exit code for the testsuite
+        the_result.assert_outcomes(passed=1)
+
+        db = sqlite3.connect(str(pymon_path))
+        cursor = db.cursor()
+        cursor.execute("SELECT RUN_DESCRIPTION FROM TEST_SESSIONS;")
+        desc = cursor.fetchall()
+        assert len(desc) == 1  # current test
+        assert desc[0][0] == match
+        pymon_path.unlink()
+
+    run_description = '{"pipeline_branch": "test", "pipeline_build_no": "123", "__ci__": "bitbucketci"}'
+    envs = {}
+    for k in [
+        "CIRCLE_BUILD_NUM",
+        "CIRCLE_JOB",
+        "DRONE_REPO_BRANCH",
+        "DRONE_BUILD_NUMBER",
+        "BUILD_NUMBER",
+        "JOB_NUMBER",
+        "JOB_NAME",
+        "TRAVIS_BUILD_ID",
+        "TRAVIS_BUILD_NUMBER",
+        "CI_PIPELINE_ID",
+        "CI_JOB_NAME",
+        "BITBUCKET_BRANCH",
+        "BITBUCKET_BUILD_NUMBER",
+    ]:
+        if k in os.environ:
+            envs[k] = os.environ[k]
+            del os.environ[k]
+
+    for env, exp in [
+        ({"BITBUCKET_BUILD_NUMBER": "123"}, "{}"),
+        ({"BITBUCKET_BUILD_NUMBER": "123", "BITBUCKET_BRANCH": "test"}, run_description),
+        ({"BITBUCKET_BRANCH": "test"}, "{}"),
+    ]:
+        if "BITBUCKET_BRANCH" in os.environ:
+            del os.environ["BITBUCKET_BRANCH"]
+        if "BITBUCKET_BUILD_NUMBER" in os.environ:
+            del os.environ["BITBUCKET_BUILD_NUMBER"]
+
+        for k, v in env.items():
+            os.environ[k] = v
+
+        result = testdir.runpytest("-v")
+        check_that(result, match=exp)
+
+    if "BITBUCKET_BRANCH" in os.environ:
+        del os.environ["BITBUCKET_BRANCH"]
+    if "BITBUCKET_BUILD_NUMBER" in os.environ:
+        del os.environ["BITBUCKET_BUILD_NUMBER"]

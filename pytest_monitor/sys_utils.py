@@ -47,6 +47,13 @@ def collect_ci_info():
             "pipeline_build_no": os.environ["CI_PIPELINE_ID"],
             "__ci__": "gitlabci",
         }
+    # Test for Bitbucket CI
+    if "BITBUCKET_BRANCH" in os.environ and "BITBUCKET_BUILD_NUMBER" in os.environ:
+        return {
+            "pipeline_branch": os.environ["BITBUCKET_BRANCH"],
+            "pipeline_build_no": os.environ["BITBUCKET_BUILD_NUMBER"],
+            "__ci__": "bitbucketci",
+        }
     return {}
 
 
