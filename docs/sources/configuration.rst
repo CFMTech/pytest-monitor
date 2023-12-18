@@ -145,6 +145,7 @@ Currently, pytest-monitor supports the following CI:
  * Jenkins
  * Drone CI
  * Circle CI
+ * Bitbucket CI
 
 The following table explains how both fields are mapped:
 
@@ -160,6 +161,8 @@ The following table explains how both fields are mapped:
 |  Gitlab CI   |  CI_JOB_NAME                      | CI_PIPELINE_ID        |   gitlabci    |
 +--------------+-----------------------------------+-----------------------+---------------+
 |  Travis CI   |  TRAVIS_BUILD_ID                  | TRAVIS_BUILD_NUMBER   |   travisci    |
++--------------+-----------------------------------+-----------------------+---------------+
+|  Bitbucket CI|  BITBUCKET_BRANCH                 | BITBUCKET_BUILD_NUMBER|   bitbucketci |
 +--------------+-----------------------------------+-----------------------+---------------+
 
 Note that none of these two fields will be added if:
