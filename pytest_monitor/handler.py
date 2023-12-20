@@ -169,8 +169,10 @@ class PostgresDBHandler:
         self.prepare()
 
     def connect(self):
-        connection_string = f"dbname='{self.__db}' user='{self.__user}' password='{self.__password}'"
-        f"host='{self.__host}' port='{self.__port}'"
+        connection_string = (
+            f"dbname='{self.__db}' user='{self.__user}' password='{self.__password}' "
+            + f"host='{self.__host}' port='{self.__port}'"
+        )
         return psycopg2.connect(connection_string)
 
     def query(self, what, bind_to, many=False):
