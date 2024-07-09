@@ -129,5 +129,7 @@ CPU_USAGE (FLOAT)
     System-wide CPU usage as a percentage (100 % is equivalent to one core).
 MEM_USAGE (FLOAT)
     Maximum resident memory used during the test execution (in megabytes).
+TEST_PASSED (BOOLEAN)
+    Boolean Value indicating if a test passed.
 
 In the local database, these Metrics are stored in table `TEST_METRICS`.

@@ -79,6 +79,14 @@ Disable monitoring
 If you need for some reason to disable the monitoring, pass the *\-\-no-monitor* option.
 
 
+Disable failed tests
+--------------------
+
+By default failing tests are monitored in the database. The database has an additional column that
+indicates if a test passed (boolean value). If you only need to monitor successful tests, pass
+the *\-\-no-failed* option.
+
+
 Describing a run
 ----------------
 

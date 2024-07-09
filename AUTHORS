@@ -4,3 +4,4 @@ Contributors include:
  - Raymond Gauthier (jraygauthier) added Python 3.5 support.
  - Kyle Altendorf (altendky) fixed bugs on session teardown
  - Hannes Engelhardt (veritogen) added Bitbucket CI support.
+ - Lucas Haupt (lhpt2) added profiler.py and track failed test support.

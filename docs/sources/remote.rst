@@ -115,7 +115,8 @@ POST /metrics/
             user_time: float,
             kernel_time: float,
             cpu_usage: float,
-            mem_usage: float
+            mem_usage: float,
+            passed: bool,
         }
 
     **Return Codes**: Must return *201* (*CREATED*) if the **Metrics** has been created

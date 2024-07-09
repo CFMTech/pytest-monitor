@@ -3,6 +3,8 @@ Changelog
 =========
 
 * :release:`to be discussed`
+* :feature: `#65` Also monitor failed test as default and add flag ``--no-failed`` to turn monitoring failed tests off.
+* :bug: `#79` Fix a bug concerning commandline flag ``--no-monitor`` causing tests that are supposed to fail to pass instead
 * :feature:`#75` Automatically gather CI build information for Bitbucket CI.
 
 * :release:`1.6.6 <2023-05-06>`
