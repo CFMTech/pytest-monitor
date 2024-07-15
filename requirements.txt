@@ -2,3 +2,4 @@ psutil>=5.1.0
 memory_profiler>=0.58
 pytest
 requests
+psycopg

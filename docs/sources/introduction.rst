@@ -28,4 +28,4 @@ Extending your application with new features, or fixing its bugs, might have an 
 Usage
 -----
 
-Simply run pytest as usual: pytest-monitor is active by default as soon as it is installed. After running your first session, a .pymon sqlite database will be accessible in the directory where pytest was run.
+Simply run pytest as usual: pytest-monitor is active by default as soon as it is installed. After running your first session, a .pymon sqlite database (or optionally another database implementation like PostgreSQL) will be accessible in the directory where pytest was run.

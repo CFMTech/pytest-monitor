@@ -3,4 +3,5 @@ Project developed and lead by Jean-Sébastine Dieu.
 Contributors include:
  - Raymond Gauthier (jraygauthier) added Python 3.5 support.
  - Kyle Altendorf (altendky) fixed bugs on session teardown
- - Hannes Engelhardt (veritogen) added Bitbucket CI support.
+ - Hannes Engelhardt (veritogen) added Bitbucket CI support and Postgres DB Handler.
+ - Lucas Haupt (lhpt2) added Postgres DB Handler.

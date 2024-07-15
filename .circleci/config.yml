@@ -2,7 +2,8 @@ version: 2.1
 
 aliases:
   docker-image: &image
-    - image: mambaorg/micromamba
+    image: mambaorg/micromamba
+
   filter-pr-only: &PR-only
     branches:
       ignore:
@@ -216,13 +217,28 @@ workflows:
 
 jobs:
   lint:
-    docker: *image
+    docker:
+      - *image
     steps:
       - make-env:
           use_specific_requirements_file: requirements.dev.txt
       - lint-project
   build:
-    docker: *image
+    docker:
+      - *image
+      - image: circleci/postgres:12-alpine
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: testing_db
+            POSTGRES_HOST: localhost
+            POSTGRES_PORT: 5432
+            PYTEST_MONITOR_DB_NAME: postgres
+            PYTEST_MONITOR_DB_USER: postgres
+            PYTEST_MONITOR_DB_PASSWORD: testing_db
+            PYTEST_MONITOR_DB_HOST: localhost
+            PYTEST_MONITOR_DB_PORT: 5432
+
     parameters:
         python:
             type: string
@@ -235,7 +251,8 @@ jobs:
           pytest: << parameters.pytest >>
       - test-project
   publish:
-    docker: *image
+    docker:
+      - *image
     steps:
       - make-env:
           extra_deps: twine setuptools build

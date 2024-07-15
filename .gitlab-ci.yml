@@ -1,5 +1,20 @@
 image: continuumio/miniconda
 
+variables:
+   - POSTGRES_DB: postgres 
+   - POSTGRES_USER: postgres 
+   - POSTGRES_PASSWORD: testing_db
+   - POSTGRES_HOST: localhost
+   - POSTGRES_PORT: 5432
+   - PYTEST_MONITOR_DB_NAME: postgres
+   - PYTEST_MONITOR_DB_USER: postgres
+   - PYTEST_MONITOR_DB_PASSWORD: testing_db
+   - PYTEST_MONITOR_DB_HOST: localhost
+   - PYTEST_MONITOR_DB_PORT: 5432
+
+services:
+   - name: postgres:16
+
 stages:
    - test
    - deploy

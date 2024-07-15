@@ -65,6 +65,12 @@ dev = [
     "flake8-pyproject==1.2.3",
     "pre-commit==3.3.3"
 ]
+psycopg = [
+    "psycopg"
+]
+psycopg2 = [
+    "psycopg2"
+]
 
 [tool.flake8]
 max-line-length = 120

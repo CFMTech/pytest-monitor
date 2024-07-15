@@ -19,6 +19,26 @@ You are free to override the name of this database by setting the `--db` option:
     pytest --db /path/to/your/monitor/database
 
 
+There is also a PostgreSQL implementation that talks to a PostgreSQL database. 
+The `--use-postgres` option is set for using PostgreSQL as database.
+
+.. code-block:: shell
+
+    pytest --use-postgres
+
+The connection parameters are set by the following environment variables:
+
+PYTEST_MONITOR_DB_HOST
+     The hostname of the instance running the PostgreSQL server
+PYTEST_MONITOR_DB_PORT
+     The port the PostgreSQL server listens on.
+PYTEST_MONITOR_DB_NAME
+     The name of the database to connect to.
+PYTEST_MONITOR_DB_USER
+     The name of the user to log into the database as.
+PYTEST_MONITOR_DB_PASSWORD
+     The password to log into the database.
+
 You can also sends your tests result to a monitor server (under development at that time) in order to centralize
 your Metrics and Execution Context (see below):
 
